@@ -11,17 +11,6 @@ The following guides will walk you through installing all required software,
 and setting up all required hardware. By the end of this section you should
 have a gamepad-controlled robot and understand the ecosystem.
 
-`FTC Next Gen Guide <https://github.com/ftctechnh/ftc_app/raw/master/doc/tutorial/FTC_NextGenGuide.pdf>`__
-  This guide will explain the hardware that is available and how everything
-  interacts.
-
-`FTC Training Manual <https://github.com/ftctechnh/ftc_app/raw/master/doc/tutorial/FTCTraining_Manual.pdf>`__
-  This guide will walk you through installing Android Studio (used to program
-  the robot app), installing the Driver Control Station (app run on separate
-  phone to connect gamepads), and running a sample robot program. Note Android
-  Studio may already have been installed by your teacher, in which case the
-  installation steps can be skipped.
-
 `FTC Game & Season Info <http://www.firstinspires.org/resource-library/ftc/game-and-season-info>`__
   This page contains all the rules and regulations regarding robot construction
   and operation.
