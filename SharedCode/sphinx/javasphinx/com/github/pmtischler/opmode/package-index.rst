@@ -6,7 +6,6 @@ com.github.pmtischler.opmode
 .. toctree::
    :maxdepth: 1
 
-   BeaconPress
    DistanceStateMachine
    DistanceStateMachine-ForwardUntilDistance
    DistanceStateMachine-LeftForTime

@@ -14,6 +14,5 @@ over time.
    pid_control
    mecanum
    record_playback
-   beacon_color
    state_machine
    velocity_vortex
