@@ -68,21 +68,19 @@ positions in a single shaft revolution.
 
     public void loop() {
         // ... other code
-        if (shouldFeedbackLinearize) {
-            // ... other code
-            // Compute speed of left,right motors.
-            double deltaTime = time - prevTime;
-            double leftSpeed = (leftFrontMotor.getCurrentPosition() - prevLeftEncoderPosition) /
-                               deltaTime;
-            double rightSpeed = (rightFrontMotor.getCurrentPosition() - prevRightEncoderPosition) /
-                                deltaTime;
-            // Track last loop() values.
-            prevTime = time;
-            prevLeftEncoderPosition = leftFrontMotor.getCurrentPosition();
-            prevRightEncoderPosition = rightFrontMotor.getCurrentPosition();
-        } else {
-            // ... other code
-        }
+
+        // Compute speed of left,right motors.
+        double deltaTime = time - prevTime;
+        double leftSpeed = (leftFrontMotor.getCurrentPosition() - prevLeftEncoderPosition) /
+                           deltaTime;
+        double rightSpeed = (rightFrontMotor.getCurrentPosition() - prevRightEncoderPosition) /
+                            deltaTime;
+        // Track last loop() values.
+        prevTime = time;
+        prevLeftEncoderPosition = leftFrontMotor.getCurrentPosition();
+        prevRightEncoderPosition = rightFrontMotor.getCurrentPosition();
+
+        // ... other code
     }
 
 **PID Constants**. Per the equation, there are three constants to control
@@ -123,21 +121,17 @@ following code to use the Pid control.
 
         public void loop() {
             // ... other code
-            if (shouldFeedbackLinearize) {
-                // ... other code
-                // Use Pid to compute motor powers to achieve wheel velocity.
-                left = leftDrive.update(wheelVelocities.getX(), leftSpeed,
-                                        deltaTime);
-                right = rightDrive.update(wheelVelocities.getY(), rightSpeed,
-                                          deltaTime);
-                // Clamp motor powers.
-                Vector2d motorPower = new Vector2d(left, right);
-                clampPowers(motorPower);
-                left = motorPower.getX();
-                right = motorPower.getY();
-            } else {
-                // ... other code
-            }
+
+            // Use Pid to compute motor powers to achieve wheel velocity.
+            left = leftDrive.update(wheelVelocities.getX(), leftSpeed,
+                                    deltaTime);
+            right = rightDrive.update(wheelVelocities.getY(), rightSpeed,
+                                      deltaTime);
+            // Clamp motor powers.
+            Vector2d motorPower = new Vector2d(left, right);
+            clampPowers(motorPower);
+            left = motorPower.getX();
+            right = motorPower.getY();
         }
     }
 

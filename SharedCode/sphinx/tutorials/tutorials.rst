@@ -10,9 +10,7 @@ over time.
    :maxdepth: 1
 
    tank_drive
-   feedback_linearization
-   pid_control
    mecanum
    record_playback
    state_machine
-   velocity_vortex
+   pid_control
