@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Tank Drive controls for Robot.
  */
 @TeleOp(name="pmtischler.TankDrive", group="pmtischler")
-@Disabled
 public class TankDrive extends RobotHardware {
     /**
      * Sets the drive chain power.

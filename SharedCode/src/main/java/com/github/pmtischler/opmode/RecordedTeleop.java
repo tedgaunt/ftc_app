@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
  * Select the manual control mode by changing the parent class.
  */
 @TeleOp(name="pmtischler.RecordedTeleop", group="pmtischler")
-@Disabled
 public class RecordedTeleop extends MecanumDrive {
     /**
      * Extends teleop initialization to start a recorder.

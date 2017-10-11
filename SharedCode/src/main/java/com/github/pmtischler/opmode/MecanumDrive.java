@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Mecanum Drive controls for Robot.
  */
 @TeleOp(name="pmtischler.MecanumDrive", group="pmtischler")
-@Disabled
 public class MecanumDrive extends RobotHardware {
     /**
      * Sets the drive chain power.

@@ -11,7 +11,6 @@ import java.io.FileInputStream;
  * This mode playbacks the recorded values previously recorded by teleop.
  */
 @Autonomous(name="pmtischler.PlaybackAuto", group="pmtischler")
-@Disabled
 public class PlaybackAuto extends OpMode {
     /**
      * Creates the playback.
