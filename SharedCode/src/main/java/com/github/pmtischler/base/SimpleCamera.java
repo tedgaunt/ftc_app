@@ -27,6 +27,8 @@ public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallb
      * Attempts to get the first camera, which should be the back camera.
      */
     public SimpleCamera(final Context context) {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
         this.context = context;
         takingPicture = false;
 
@@ -121,7 +123,7 @@ public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallb
 
         try {
             File file = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), "picture.jpg");
+                        Environment.DIRECTORY_PICTURES), "SimpleCamera.jpg");
             FileOutputStream output = new FileOutputStream(file);
             output.write(data);
             output.close();
