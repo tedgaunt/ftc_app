@@ -27,7 +27,7 @@ public class RelicRecoveryAuto extends RobotHardware {
 
     @Override
     public void loop() {
-
+        machine.update();
     }
 
     // The state machine.
