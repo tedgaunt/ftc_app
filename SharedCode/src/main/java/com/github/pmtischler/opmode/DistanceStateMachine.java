@@ -27,10 +27,10 @@ public class DistanceStateMachine extends MecanumDrive {
         @Override
         public State update() {
             if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
-                setDrive(new Mecanum.Motion(1, 0, 0));
+                setDriveForMecanum(new Mecanum.Motion(1, 0, 0));
                 return this;
             } else {
-                setDrive(new Mecanum.Motion(0, 0, 0));
+                setDriveForMecanum(new Mecanum.Motion(0, 0, 0));
                 return leftForTime;
             }
         }
@@ -48,10 +48,10 @@ public class DistanceStateMachine extends MecanumDrive {
         @Override
         public State update() {
             if (time - startTime < 2) {
-                setDrive(new Mecanum.Motion(1, Math.PI, 0));
+                setDriveForMecanum(new Mecanum.Motion(1, Math.PI, 0));
                 return this;
             } else {
-                setDrive(new Mecanum.Motion(0, 0, 0));
+                setDriveForMecanum(new Mecanum.Motion(0, 0, 0));
                 return null;
             }
         }
