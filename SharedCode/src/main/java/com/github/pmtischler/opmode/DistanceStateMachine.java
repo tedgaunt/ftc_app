@@ -2,6 +2,7 @@ package com.github.pmtischler.opmode;
 
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
+import com.github.pmtischler.control.Mecanum;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -26,10 +27,10 @@ public class DistanceStateMachine extends MecanumDrive {
         @Override
         public State update() {
             if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
-                setDrive(1, 0, 0);
+                setDrive(new Mecanum.Motion(1, 0, 0));
                 return this;
             } else {
-                setDrive(0, 0, 0);
+                setDrive(new Mecanum.Motion(0, 0, 0));
                 return leftForTime;
             }
         }
@@ -47,10 +48,10 @@ public class DistanceStateMachine extends MecanumDrive {
         @Override
         public State update() {
             if (time - startTime < 2) {
-                setDrive(1, Math.PI, 0);
+                setDrive(new Mecanum.Motion(1, Math.PI, 0));
                 return this;
             } else {
-                setDrive(0, 0, 0);
+                setDrive(new Mecanum.Motion(0, 0, 0));
                 return null;
             }
         }

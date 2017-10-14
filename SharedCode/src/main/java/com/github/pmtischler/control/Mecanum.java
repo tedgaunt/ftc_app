@@ -18,6 +18,46 @@ import java.util.List;
  */
 public class Mecanum {
     /**
+     * Mecanum motion vector.
+     */
+    public static class Motion {
+        // Robot speed [-1, 1].
+        public final double vD;
+        // Robot angle while moving [0, 2pi].
+        public final double thetaD;
+        // Speed for changing direction [-1, 1].
+        public final double vTheta;
+
+        /**
+         * Sets the motion to the given values.
+         */
+        public Motion(double vD, double thetaD, double vTheta) {
+            this.vD = vD;
+            this.thetaD = thetaD;
+            this.vTheta = vTheta;
+        }
+    }
+
+    /**
+     * Gets the motion vector from the joystick values.
+     * @param left_stick_x The left joystick X.
+     * @param left_stick_y The left joystick Y.
+     * @param right_stick_x The right joystick X.
+     * @param right_stick_y The right joystick Y.
+     * @return The Mecanum motion vector.
+     */
+    public static Motion joystickToMotion(double left_stick_x,
+                                          double left_stick_y,
+                                          double right_stick_x,
+                                          double right_stick_y) {
+        double vD = Math.sqrt(Math.pow(left_stick_x, 2) +
+                              Math.pow(left_stick_y, 2));
+        double thetaD = Math.atan2(left_stick_x, left_stick_y);
+        double vTheta = -right_stick_x;
+        return new Motion(vD, thetaD, vTheta);
+    }
+
+    /**
      * Mecanum wheels, used to get individual motor powers.
      */
     public static class Wheels {
@@ -41,19 +81,23 @@ public class Mecanum {
 
     /**
      * Gets the wheel powers corresponding to desired motion.
-     * @param vD The desired robot speed. [-1, 1]
-     * @param thetaD The angle at which the robot should move. [0, 2PI]
-     * @param vTheta The desired rotation velocity. [-1, 1]
+     * @param motion The Mecanum motion vector.
      * @return The wheels with clamped powers. [-1, 1]
      */
-    public static Wheels motionToWheels(double vD, double thetaD, double vTheta) {
+    public static Wheels motionToWheels(Motion motion) {
+        double vD = motion.vD;
+        double thetaD = motion.thetaD;
+        double vTheta = motion.vTheta;
+
         double frontLeft = vD * Math.sin(thetaD + Math.PI / 4) + vTheta;
         double frontRight  = vD * Math.cos(thetaD + Math.PI / 4) - vTheta;
         double backLeft = vD * Math.cos(thetaD + Math.PI / 4) + vTheta;
         double backRight = vD * Math.sin(thetaD + Math.PI / 4) - vTheta;
-        List<Double> motors = Arrays.asList(frontLeft, frontRight, backLeft, backRight);
+        List<Double> motors = Arrays.asList(frontLeft, frontRight,
+                                            backLeft, backRight);
         clampPowers(motors);
-        return new Wheels(motors.get(0), motors.get(1), motors.get(2), motors.get(3));
+        return new Wheels(motors.get(0), motors.get(1),
+                          motors.get(2), motors.get(3));
     }
 
     /**

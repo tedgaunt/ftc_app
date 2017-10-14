@@ -40,8 +40,8 @@ for joysticks :math:`J_x`.
 .. math::
 
     V_d &= \sqrt{J_{left, x}^2 + J_{left, y}^2} \\
-    \theta_d &= arctan(J_{left, y}, J_{left x}) \\
-    V_\theta &= J_{right, x}
+    \theta_d &= arctan(J_{left, x}, J_{left y}) \\
+    V_\theta &= -J_{right, x}
 
 These functions don't account for bounded outputs. That is, the joystick inputs
 can yield an output power greater than 100%, which isn't possible. In order to
@@ -81,13 +81,13 @@ the formulas above. Update the ``loop`` function with the following code.
 
   public void loop() {
     if (shouldMecanumDrive) {
-        double vD = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) +
-                              Math.pow(gamepad1.left_stick_y, 2));
-        double thetaD = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x);
-        double vTheta = gamepad1.right_stick_x;
+        // Convert joysticks to desired motion.
+        Mecanum.Motion motion = Mecanum.joystickToMotion(
+                            gamepad1.left_stick_x, gamepad1.left_stick_y,
+                            gamepad1.right_stick_x, gamepad1.right_stick_y);
 
         // Convert desired motion to wheel powers, with power clamping.
-        Mecanum.Wheels wheels = Mecanum.motionToWheels(vD, thetaD, vTheta);
+        Mecanum.Wheels wheels = Mecanum.motionToWheels(motion);
         leftFrontMotor.setPower(wheels.frontLeft);
         rightFrontMotor.setPower(wheels.frontRight);
         leftBackMotor.setPower(wheels.backLeft);
