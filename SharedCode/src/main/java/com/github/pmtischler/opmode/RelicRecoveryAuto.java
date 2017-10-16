@@ -129,9 +129,12 @@ public class RelicRecoveryAuto extends RobotHardware {
             int red = getColorSensor(ColorSensorName.JEWEL, Color.RED);
             int blue = getColorSensor(ColorSensorName.JEWEL, Color.BLUE);
 
-            if (red > blue) {
+            if ((red > blue && robot_color == Color.BLUE) ||
+                    (blue > red && robot_color == Color.RED)) {
+                // Reading other team's jewel in forward position.
                 forwardJewelArm();
             } else {
+                // Reading our team's jewel in forward position.
                 backwardJewelArm();
             }
             return next;
