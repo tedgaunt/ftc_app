@@ -9,12 +9,50 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 /**
  * Autonomous demo for FTC Relic Recovery game.
  */
-@Autonomous(name="pmtischler.RelicRecoveryAuto", group="pmtischler")
 public class RelicRecoveryAuto extends RobotHardware {
+
+    @Autonomous(name="pmt.Auto.Red.Center", group="pmtischler")
+    public class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
+        @Override public void init() {
+            robot_color = Color.RED;
+            robot_start_pos = StartPosition.FIELD_CENTER;
+            super.init();
+        }
+    }
+
+    @Autonomous(name="pmt.Auto.Red.Corner", group="pmtischler")
+    public class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
+        @Override public void init() {
+            robot_color = Color.RED;
+            robot_start_pos = StartPosition.FIELD_CORNER;
+            super.init();
+        }
+    }
+
+    @Autonomous(name="pmt.Auto.Blue.Center", group="pmtischler")
+    public class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
+        @Override public void init() {
+            robot_color = Color.BLUE;
+            robot_start_pos = StartPosition.FIELD_CENTER;
+            super.init();
+        }
+    }
+
+    @Autonomous(name="pmt.Auto.Blue.Corner", group="pmtischler")
+    public class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
+        @Override public void init() {
+            robot_color = Color.BLUE;
+            robot_start_pos = StartPosition.FIELD_CORNER;
+            super.init();
+        }
+    }
 
     @Override
     public void init() {
         super.init();
+
+        telemetry.addData("Robot Color", robot_color.name());
+        telemetry.addData("Robot Start Position", robot_start_pos.name());
 
         StateMachine.State jewel_reset_wait = new WaitForDuration(2, null);
         StateMachine.State jewel_reset = new ResetJewelArm(jewel_reset_wait);
@@ -24,15 +62,15 @@ public class RelicRecoveryAuto extends RobotHardware {
         StateMachine.State jewel_drop = new DropJewelArm(jewel_drop_wait);
 
         machine = new StateMachine(jewel_drop);
+
+        telemetry.update();
     }
 
     @Override
     public void loop() {
         machine.update();
+        telemetry.update();
     }
-
-    // The state machine.
-    private StateMachine machine;
 
     // State in the machine to wait for a duration.
     public class WaitForDuration implements StateMachine.State {
@@ -120,4 +158,11 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         private StateMachine.State next;
     }
+
+    // The state machine.
+    private StateMachine machine;
+    // The robot's color.
+    protected Color robot_color;
+    // The robot's starting position.
+    protected StartPosition robot_start_pos;
 }

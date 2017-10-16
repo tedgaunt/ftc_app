@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 /**
  * Manual demo for FTC Relic Recovery game.
  */
-@TeleOp(name="pmtischler.RelicRecoveryManual", group="pmtischler")
+@TeleOp(name="pmt.TeleOp.Manual", group="pmtischler")
 public class RelicRecoveryManual extends RobotHardware {
     /**
      * Mecanum drive control program.

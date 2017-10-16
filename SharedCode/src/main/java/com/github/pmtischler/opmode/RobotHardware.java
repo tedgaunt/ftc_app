@@ -123,6 +123,12 @@ public abstract class RobotHardware extends OpMode {
         }
     }
 
+    // Possible starting positions.
+    public enum StartPosition {
+        FIELD_CENTER,
+        FIELD_CORNER,
+    }
+
     /**
      * Initialize the hardware handles.
      */
