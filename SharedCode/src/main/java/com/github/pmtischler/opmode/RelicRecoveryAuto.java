@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 public class RelicRecoveryAuto extends RobotHardware {
 
     @Autonomous(name="pmt.Auto.Red.Center", group="pmtischler")
-    public class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
+    public static class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robot_color = Color.RED;
             robot_start_pos = StartPosition.FIELD_CENTER;
@@ -21,7 +21,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Auto.Red.Corner", group="pmtischler")
-    public class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
+    public static class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robot_color = Color.RED;
             robot_start_pos = StartPosition.FIELD_CORNER;
@@ -30,7 +30,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Auto.Blue.Center", group="pmtischler")
-    public class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
+    public static class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robot_color = Color.BLUE;
             robot_start_pos = StartPosition.FIELD_CENTER;
@@ -39,7 +39,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Auto.Blue.Corner", group="pmtischler")
-    public class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
+    public static class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robot_color = Color.BLUE;
             robot_start_pos = StartPosition.FIELD_CORNER;
