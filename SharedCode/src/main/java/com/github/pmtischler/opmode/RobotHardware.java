@@ -148,6 +148,7 @@ public abstract class RobotHardware extends OpMode {
         }
 
         raiseJewelArm();
+        centerJewelArm();
     }
 
     /**
