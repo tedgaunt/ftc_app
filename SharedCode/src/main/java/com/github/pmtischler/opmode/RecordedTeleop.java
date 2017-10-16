@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
  * Select the manual control mode by changing the parent class.
  */
 @TeleOp(name="pmtischler.RecordedTeleop", group="pmtischler")
-public class RecordedTeleop extends MecanumDrive {
+public class RecordedTeleop extends RelicRecoveryManual {
     /**
      * Extends teleop initialization to start a recorder.
      */
@@ -35,10 +35,12 @@ public class RecordedTeleop extends MecanumDrive {
         super.loop();
 
         try {
-            recorder.record("leftFront", time);
-            recorder.record("rightFront", time);
-            recorder.record("leftBack", time);
-            recorder.record("rightBack", time);
+            for (MotorName m : MotorName.values()) {
+                recorder.record(m.name(), time);
+            }
+            for (ServoName s : ServoName.values()) {
+                recorder.record(s.name(), time);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             requestOpModeStop();
