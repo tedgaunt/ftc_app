@@ -16,7 +16,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     public void init() {
         super.init();
 
-        StateMachine.State jewel_reset = new ResetJewelArm(null);
+        StateMachine.State jewel_reset_wait = new WaitForDuration(2, null);
+        StateMachine.State jewel_reset = new ResetJewelArm(jewel_reset_wait);
         StateMachine.State jewel_hit_wait = new WaitForDuration(2, jewel_reset);
         StateMachine.State jewel_hit = new HitJewel(jewel_hit_wait);
         StateMachine.State jewel_drop_wait = new WaitForDuration(2, jewel_hit);
