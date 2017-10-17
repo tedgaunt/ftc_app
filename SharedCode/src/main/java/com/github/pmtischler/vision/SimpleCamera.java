@@ -20,6 +20,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 /**
  * Camera for taking pictures.
  * Manages the Android camera lifecycle and returns OpenCV images.
+ * Must load the OpenCV library before using this class.
+ *     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
  */
 public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallback {
     /**
@@ -27,8 +29,6 @@ public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallb
      * Attempts to get the first camera, which should be the back camera.
      */
     public SimpleCamera(final Context context) {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
         this.context = context;
         takingPicture = false;
 
