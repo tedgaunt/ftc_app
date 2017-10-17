@@ -1,4 +1,4 @@
-package com.github.pmtischler.base;
+package com.github.pmtischler.vision;
 
 import java.io.File;
 import java.io.FileOutputStream;
