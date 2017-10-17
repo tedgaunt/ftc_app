@@ -55,12 +55,9 @@ public class RelicRecoveryAuto extends RobotHardware {
         telemetry.addData("Robot Color", robot_color.name());
         telemetry.addData("Robot Start Position", robot_start_pos.name());
 
-        StateMachine.State jewel_reset_wait = new WaitForDuration(2, null);
-        StateMachine.State jewel_reset = new ResetJewelArm(jewel_reset_wait);
-        StateMachine.State jewel_hit_wait = new WaitForDuration(2, jewel_reset);
-        StateMachine.State jewel_hit = new HitJewel(jewel_hit_wait);
-        StateMachine.State jewel_drop_wait = new WaitForDuration(2, jewel_hit);
-        StateMachine.State jewel_drop = new DropJewelArm(jewel_drop_wait);
+        StateMachine.State jewel_reset = new ResetJewelArm(null);
+        StateMachine.State jewel_hit = new HitJewel(jewel_reset);
+        StateMachine.State jewel_drop = new DropJewelArm(jewel_hit);
 
         machine = new StateMachine(jewel_drop);
 
@@ -110,7 +107,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         @Override
         public State update() {
             lowerJewelArm();
-            return next;
+            return new WaitForDuration(2, next);
         }
 
         private StateMachine.State next;
@@ -140,7 +137,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                 // Reading our team's jewel in forward position.
                 backwardJewelArm();
             }
-            return next;
+            return new WaitForDuration(2, next);
         }
 
         private StateMachine.State next;
@@ -159,7 +156,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         public State update() {
             raiseJewelArm();
             centerJewelArm();
-            return next;
+            return new WaitForDuration(1, next);
         }
 
         private StateMachine.State next;
