@@ -37,6 +37,16 @@ public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallb
         camera.setPreviewCallback(this);
         camera.enableShutterSound(true);
 
+        // Find and set the max picture size.
+        Camera.Size picture_size = null;
+        for (Camera.Size size : camera.getParameters().getSupportedPictureSizes()) {
+            if (picture_size == null || picture_size.width < size.width) {
+                picture_size = size;
+            }
+        }
+        camera.getParameters().setPictureSize(picture_size.width,
+                                              picture_size.height);
+
         // Create surface on UI thread.
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
