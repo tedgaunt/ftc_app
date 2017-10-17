@@ -1,5 +1,6 @@
 package com.github.pmtischler.opmode;
 
+import com.github.pmtischler.base.Color;
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
 import com.github.pmtischler.control.Mecanum;
@@ -14,7 +15,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Red.Center", group="pmtischler")
     public static class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.RED;
+            robot_color = Color.Ftc.RED;
             robot_start_pos = StartPosition.FIELD_CENTER;
             super.init();
         }
@@ -23,7 +24,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Red.Corner", group="pmtischler")
     public static class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.RED;
+            robot_color = Color.Ftc.RED;
             robot_start_pos = StartPosition.FIELD_CORNER;
             super.init();
         }
@@ -32,7 +33,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Blue.Center", group="pmtischler")
     public static class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.BLUE;
+            robot_color = Color.Ftc.BLUE;
             robot_start_pos = StartPosition.FIELD_CENTER;
             super.init();
         }
@@ -41,7 +42,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Blue.Corner", group="pmtischler")
     public static class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.BLUE;
+            robot_color = Color.Ftc.BLUE;
             robot_start_pos = StartPosition.FIELD_CORNER;
             super.init();
         }
@@ -126,11 +127,13 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         @Override
         public State update() {
-            int red = getColorSensor(ColorSensorName.JEWEL, Color.RED);
-            int blue = getColorSensor(ColorSensorName.JEWEL, Color.BLUE);
+            int r = getColorSensor(ColorSensorName.JEWEL,
+                                   Color.Channel.RED);
+            int b = getColorSensor(ColorSensorName.JEWEL,
+                                   Color.Channel.BLUE);
 
-            if ((red > blue && robot_color == Color.BLUE) ||
-                    (blue > red && robot_color == Color.RED)) {
+            if ((r > b && robot_color == Color.Ftc.BLUE) ||
+                    (b > r && robot_color == Color.Ftc.RED)) {
                 // Reading other team's jewel in forward position.
                 forwardJewelArm();
             } else {
@@ -165,7 +168,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     // The state machine.
     private StateMachine machine;
     // The robot's color.
-    protected Color robot_color;
+    protected Color.Ftc robot_color;
     // The robot's starting position.
     protected StartPosition robot_start_pos;
 }

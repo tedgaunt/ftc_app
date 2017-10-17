@@ -1,5 +1,6 @@
 package com.github.pmtischler.opmode;
 
+import com.github.pmtischler.base.Color;
 import com.github.pmtischler.control.Mecanum;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -94,14 +95,6 @@ public abstract class RobotHardware extends OpMode {
         setAngle(ServoName.JEWEL_HIT, 0);
     }
 
-    // Possible colors.
-    public enum Color {
-        RED,
-        GREEN,
-        BLUE,
-        ALPHA,
-    }
-
     // The color sensors on the robot.
     public enum ColorSensorName {
         JEWEL,
@@ -110,9 +103,9 @@ public abstract class RobotHardware extends OpMode {
     /**
      * Gets the color value on the sensor.
      * @param sensor The sensor to read.
-     * @param color The color to read intensity.
+     * @param color The color channel to read intensity.
      */
-    public int getColorSensor(ColorSensorName sensor, Color color) {
+    public int getColorSensor(ColorSensorName sensor, Color.Channel color) {
         ColorSensor s = allColorSensors.get(sensor.ordinal());
         switch (color) {
             case RED: return s.red();
