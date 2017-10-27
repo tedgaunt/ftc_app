@@ -137,7 +137,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                 // Reading our team's jewel in forward position.
                 backwardJewelArm();
             }
-            return new WaitForDuration(2, next);
+            return new WaitForDuration(1, next);
         }
 
         private StateMachine.State next;
