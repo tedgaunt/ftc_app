@@ -28,7 +28,12 @@ public abstract class RobotHardware extends OpMode {
      * @param power The power to set [-1, 1].
      */
     public void setPower(MotorName motor, double power) {
-        allMotors.get(motor.ordinal()).setPower(power);
+        DcMotor m = allMotors.get(motor.ordinal());
+        if (m == null) {
+            telemetry.addData("Motor Missing", motor.name());
+        } else {
+            m.setPower(power);
+        }
     }
 
     /**
@@ -67,7 +72,12 @@ public abstract class RobotHardware extends OpMode {
      * @param position The angle to set [0, 1].
      */
     public void setAngle(ServoName servo, double position) {
-        allServos.get(servo.ordinal()).setPosition(position);
+        Servo s = allServos.get(servo.ordinal());
+        if (s == null) {
+            telemetry.addData("Servo Missing", servo.name());
+        } else {
+            s.setPosition(position);
+        }
     }
 
     // Raises the jewel arm.
@@ -107,12 +117,32 @@ public abstract class RobotHardware extends OpMode {
      */
     public int getColorSensor(ColorSensorName sensor, Color.Channel color) {
         ColorSensor s = allColorSensors.get(sensor.ordinal());
+        if (s == null) {
+            telemetry.addData("Color Sensor Missing", sensor.name());
+            return 0;
+        }
+
         switch (color) {
             case RED: return s.red();
             case GREEN: return s.green();
             case BLUE: return s.blue();
             case ALPHA: return s.alpha();
             default: return 0;
+        }
+    }
+
+    /**
+     * Sets the LED power for the color sensor.
+     * @param sensor The sensor to set the LED power.
+     * @param enabled Whether to turn the LED on.
+     */
+    public void setColorSensorLedEnabled(ColorSensorName sensor,
+                                         boolean enabled) {
+        ColorSensor s = allColorSensors.get(sensor.ordinal());
+        if (s == null) {
+            telemetry.addData("Color Sensor Missing", sensor.name());
+        } else {
+            s.enableLed(enabled);
         }
     }
 
@@ -128,24 +158,36 @@ public abstract class RobotHardware extends OpMode {
     public void init() {
         allMotors = new ArrayList<DcMotor>();
         for (MotorName m : MotorName.values()) {
-            DcMotor motor = hardwareMap.get(DcMotor.class, m.name());
-            motor.setPower(0);
-            allMotors.add(motor);
+            try {
+                allMotors.add(hardwareMap.get(DcMotor.class, m.name()));
+            } catch (Exception e) {
+                telemetry.addData("Motor Missing", m.name());
+                allMotors.add(null);
+            }
         }
 
         allServos = new ArrayList<Servo>();
         for (ServoName s : ServoName.values()) {
-            Servo servo = hardwareMap.get(Servo.class, s.name());
-            allServos.add(servo);
+            try {
+                allServos.add(hardwareMap.get(Servo.class, s.name()));
+            } catch (Exception e) {
+                telemetry.addData("Servo Missing", s.name());
+                allServos.add(null);
+            }
         }
 
         allColorSensors = new ArrayList<ColorSensor>();
         for (ColorSensorName s : ColorSensorName.values()) {
-            ColorSensor sensor = hardwareMap.get(ColorSensor.class, s.name());
-            sensor.enableLed(true);
-            allColorSensors.add(sensor);
+            try {
+                allColorSensors.add(hardwareMap.get(ColorSensor.class,
+                                                    s.name()));
+            } catch (Exception e) {
+                telemetry.addData("Color Sensor Missing", s.name());
+                allColorSensors.add(null);
+            }
         }
 
+        setColorSensorLedEnabled(ColorSensorName.JEWEL, true);
         raiseJewelArm();
         centerJewelArm();
     }
@@ -156,11 +198,11 @@ public abstract class RobotHardware extends OpMode {
     public void stop() {
         super.stop();
 
-        for (DcMotor motor : allMotors) {
-            motor.setPower(0);
+        for (MotorName m : MotorName.values()) {
+            setPower(m, 0);
         }
-        for (ColorSensor sensor : allColorSensors) {
-            sensor.enableLed(false);
+        for (ColorSensorName s : ColorSensorName.values()) {
+            setColorSensorLedEnabled(s, false);
         }
     }
 
