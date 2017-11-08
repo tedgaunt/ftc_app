@@ -9,6 +9,9 @@ import org.opencv.imgproc.Imgproc;
 
 /**
  * Utilities for operating with FTC colors over images.
+ * Example:
+ *   Mat img = ...;
+ *   FtcColor.simplifyImg(img);
  */
 public class FtcColor {
     // Simplifies the image into red, blue, or black pixels.

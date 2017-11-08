@@ -15,6 +15,15 @@ import java.util.List;
  *   V_{front,right} = V_d cos(theta_d + pi/4) - V_theta
  *   V_{back,left} = V_d cos(theta_d + pi/4) + V_theta
  *   V_{back,right} = V_d sin(theta_d + pi/4) - V_theta
+ *
+ *  Example:
+ *    // Convert joysticks to wheel powers.
+ *    Mecanum.Wheels wheels = Mecanum.motionToWheels(
+ *        Mecanum.joystickToMotion(
+ *            gamepad1.left_stick_x, gamepad1.left_stick_y,
+ *            gamepad1.right_stick_x, gamepad1.right_stick_y));
+ *    // Set power on the motors.
+ *    frontLeftMotor.setPower(wheels.frontLeft);
  */
 public class Mecanum {
     /**

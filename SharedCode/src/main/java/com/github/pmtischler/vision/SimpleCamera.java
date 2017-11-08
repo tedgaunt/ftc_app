@@ -20,8 +20,26 @@ import org.opencv.imgcodecs.Imgcodecs;
 /**
  * Camera for taking pictures.
  * Manages the Android camera lifecycle and returns OpenCV images.
- * Must load the OpenCV library before using this class.
+ * Must load the OpenCV library before using this class (e.g. in init()).
  *     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+ * Example:
+ *   private SimpleCamera camera;
+ *
+ *   public void init() {
+ *       System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+ *       camera = new SimpleCamera(hardwareMap.appContext);
+ *   }
+ *
+ *   public void loop() {
+ *       // Start next capture if not already inflight.
+ *       camera.startCapture();
+ *
+ *       // Check for an image.
+ *       Mat img = camera.takeImage();
+ *       if (img) {
+ *           // ... Handle image
+ *      }
+ *   }
  */
 public class SimpleCamera implements Camera.PreviewCallback, Camera.PictureCallback {
     /**
