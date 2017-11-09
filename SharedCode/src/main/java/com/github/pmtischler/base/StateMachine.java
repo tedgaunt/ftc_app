@@ -46,6 +46,11 @@ public class StateMachine {
         state = next;
     }
 
+    // Gets the current state.
+    public State currentState() {
+        return state;
+    }
+
     // The current state.
     private State state;
 }

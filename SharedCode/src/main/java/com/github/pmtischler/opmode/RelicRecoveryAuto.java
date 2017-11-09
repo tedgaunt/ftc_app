@@ -4,8 +4,11 @@ import com.github.pmtischler.base.Color;
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
 import com.github.pmtischler.control.Mecanum;
+import com.github.pmtischler.vision.SimpleVuforia;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 /**
  * Autonomous demo for FTC Relic Recovery game.
@@ -15,8 +18,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Red.Center", group="pmtischler")
     public static class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.Ftc.RED;
-            robot_start_pos = StartPosition.FIELD_CENTER;
+            robotColor = Color.Ftc.RED;
+            robotStartPos = StartPosition.FIELD_CENTER;
             super.init();
         }
     }
@@ -24,8 +27,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Red.Corner", group="pmtischler")
     public static class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.Ftc.RED;
-            robot_start_pos = StartPosition.FIELD_CORNER;
+            robotColor = Color.Ftc.RED;
+            robotStartPos = StartPosition.FIELD_CORNER;
             super.init();
         }
     }
@@ -33,8 +36,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Blue.Center", group="pmtischler")
     public static class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.Ftc.BLUE;
-            robot_start_pos = StartPosition.FIELD_CENTER;
+            robotColor = Color.Ftc.BLUE;
+            robotStartPos = StartPosition.FIELD_CENTER;
             super.init();
         }
     }
@@ -42,8 +45,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Autonomous(name="pmt.Auto.Blue.Corner", group="pmtischler")
     public static class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
         @Override public void init() {
-            robot_color = Color.Ftc.BLUE;
-            robot_start_pos = StartPosition.FIELD_CORNER;
+            robotColor = Color.Ftc.BLUE;
+            robotStartPos = StartPosition.FIELD_CORNER;
             super.init();
         }
     }
@@ -52,14 +55,17 @@ public class RelicRecoveryAuto extends RobotHardware {
     public void init() {
         super.init();
 
-        telemetry.addData("Robot Color", robot_color.name());
-        telemetry.addData("Robot Start Position", robot_start_pos.name());
+        vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-        StateMachine.State jewel_reset = new ResetJewelArm(null);
-        StateMachine.State jewel_hit = new HitJewel(jewel_reset);
-        StateMachine.State jewel_drop = new DropJewelArm(jewel_hit);
+        telemetry.addData("Robot Color", robotColor.name());
+        telemetry.addData("Robot Start Position", robotStartPos.name());
 
-        machine = new StateMachine(jewel_drop);
+        StateMachine.State jewelReset = new ResetJewelArm(null);
+        StateMachine.State jewelHit = new HitJewel(jewelReset);
+        StateMachine.State jewelDrop = new DropJewelArm(jewelHit);
+        StateMachine.State detectVuforia = new DetectVuforia(jewelDrop);
+
+        machine = new StateMachine(detectVuforia);
 
         telemetry.update();
     }
@@ -67,6 +73,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Override
     public void loop() {
         machine.update();
+        telemetry.addData("vuMark", vuMark.name());
         telemetry.update();
     }
 
@@ -79,12 +86,12 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         @Override
         public void start() {
-            start_time = time;
+            startTime = time;
         }
 
         @Override
         public State update() {
-            if (time - start_time > duration) {
+            if (time - startTime > duration) {
                 return next;
             }
             return this;
@@ -92,8 +99,43 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         private double duration;
         private StateMachine.State next;
-        private double start_time;
+        private double startTime;
     }
+
+    // Detects the Vuforia Mark.
+    public class DetectVuforia implements StateMachine.State {
+        public DetectVuforia(StateMachine.State next) {
+            this.next = next;
+            vuforia = new SimpleVuforia(hardwareMap.appContext);
+        }
+
+        @Override
+        public void start() {
+            startTime = time;
+        }
+
+        @Override
+        public State update() {
+            vuMark = vuforia.detectMark();
+            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                // Found the mark.
+                return next;
+            }
+
+            if (time - startTime > 5) {
+                // Did not detect mark within time bound.
+                vuMark = RelicRecoveryVuMark.UNKNOWN;
+                return next;
+            }
+
+            return this;
+        }
+
+        private StateMachine.State next;
+        private SimpleVuforia vuforia;
+        private double startTime;
+    }
+
 
     // Drops the jewel arm.
     public class DropJewelArm implements StateMachine.State {
@@ -129,8 +171,8 @@ public class RelicRecoveryAuto extends RobotHardware {
             int b = getColorSensor(ColorSensorName.JEWEL,
                                    Color.Channel.BLUE);
 
-            if ((r > b && robot_color == Color.Ftc.BLUE) ||
-                    (b > r && robot_color == Color.Ftc.RED)) {
+            if ((r > b && robotColor == Color.Ftc.BLUE) ||
+                    (b > r && robotColor == Color.Ftc.RED)) {
                 // Reading other team's jewel in forward position.
                 forwardJewelArm();
             } else {
@@ -165,7 +207,9 @@ public class RelicRecoveryAuto extends RobotHardware {
     // The state machine.
     private StateMachine machine;
     // The robot's color.
-    protected Color.Ftc robot_color;
+    protected Color.Ftc robotColor;
     // The robot's starting position.
-    protected StartPosition robot_start_pos;
+    protected StartPosition robotStartPos;
+    // The detected Vuforia Mark.
+    private RelicRecoveryVuMark vuMark;
 }

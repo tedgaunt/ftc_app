@@ -45,18 +45,18 @@ public class FtcColorTest {
         writeImage(img, "cryptobox_red.jpg");
     }
 
-    public void assertSimplifyHsv(int in_h, int in_s, int in_v,
-                                  int out_h, int out_s, int out_v) {
+    public void assertSimplifyHsv(int inH, int inS, int inV,
+                                  int outH, int outS, int outV) {
         byte[] pixel = new byte[3];
-        pixel[0] = (byte)in_h;
-        pixel[1] = (byte)in_s;
-        pixel[2] = (byte)in_v;
+        pixel[0] = (byte)inH;
+        pixel[1] = (byte)inS;
+        pixel[2] = (byte)inV;
 
         FtcColor.simplifyHsv(pixel);
 
-        assertEquals(out_h, pixel[0] & 0xFF);
-        assertEquals(out_s, pixel[1] & 0xFF);
-        assertEquals(out_v, pixel[2] & 0xFF);
+        assertEquals(outH, pixel[0] & 0xFF);
+        assertEquals(outS, pixel[1] & 0xFF);
+        assertEquals(outV, pixel[2] & 0xFF);
     }
 
     @Test

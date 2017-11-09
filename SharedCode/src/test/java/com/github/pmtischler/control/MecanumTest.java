@@ -13,12 +13,12 @@ public class MecanumTest {
     /**
      * Asserts that the input controls yields the expected motion.
      */
-    private void assertMotion(double left_stick_x, double left_stick_y,
-                              double right_stick_x, double right_stick_y,
+    private void assertMotion(double leftStickX, double leftStickY,
+                              double rightStickX, double rightStickY,
                               double vD, double thetaD, double vTheta) {
         Mecanum.Motion motion = Mecanum.joystickToMotion(
-                left_stick_x, left_stick_y,
-                right_stick_x, right_stick_y);
+                leftStickX, leftStickY,
+                rightStickX, rightStickY);
         assertEquals(vD, motion.vD, diffThresh);
         assertEquals(thetaD, motion.thetaD, diffThresh);
         assertEquals(vTheta, motion.vTheta, diffThresh);

@@ -49,20 +49,20 @@ public class Mecanum {
 
     /**
      * Gets the motion vector from the joystick values.
-     * @param left_stick_x The left joystick X.
-     * @param left_stick_y The left joystick Y.
-     * @param right_stick_x The right joystick X.
-     * @param right_stick_y The right joystick Y.
+     * @param leftStickX The left joystick X.
+     * @param leftStickY The left joystick Y.
+     * @param rightStickX The right joystick X.
+     * @param rightStickY The right joystick Y.
      * @return The Mecanum motion vector.
      */
-    public static Motion joystickToMotion(double left_stick_x,
-                                          double left_stick_y,
-                                          double right_stick_x,
-                                          double right_stick_y) {
-        double vD = Math.sqrt(Math.pow(left_stick_x, 2) +
-                              Math.pow(left_stick_y, 2));
-        double thetaD = Math.atan2(left_stick_x, left_stick_y);
-        double vTheta = -right_stick_x;
+    public static Motion joystickToMotion(double leftStickX,
+                                          double leftStickY,
+                                          double rightStickX,
+                                          double rightStickY) {
+        double vD = Math.sqrt(Math.pow(leftStickX, 2) +
+                              Math.pow(leftStickY, 2));
+        double thetaD = Math.atan2(leftStickX, leftStickY);
+        double vTheta = -rightStickX;
         return new Motion(vD, thetaD, vTheta);
     }
 
