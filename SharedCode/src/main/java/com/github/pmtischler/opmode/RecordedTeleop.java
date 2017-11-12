@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
  * This mode records the hardware which can later be played back in autonomous.
  * Select the manual control mode by changing the parent class.
  */
-@TeleOp(name="pmt.TeleOp.Recorded", group="pmtischler")
+@TeleOp(name="pmt.Recorded", group="pmtischler")
 public class RecordedTeleop extends RelicRecoveryManual {
     /**
      * Extends teleop initialization to start a recorder.

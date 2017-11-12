@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  */
 public class RelicRecoveryAuto extends RobotHardware {
 
-    @Autonomous(name="pmt.Auto.Red.Center", group="pmtischler")
+    @Autonomous(name="pmt.Red.Center", group="pmtischler")
     public static class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.RED;
@@ -24,7 +24,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         }
     }
 
-    @Autonomous(name="pmt.Auto.Red.Corner", group="pmtischler")
+    @Autonomous(name="pmt.Red.Corner", group="pmtischler")
     public static class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.RED;
@@ -33,7 +33,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         }
     }
 
-    @Autonomous(name="pmt.Auto.Blue.Center", group="pmtischler")
+    @Autonomous(name="pmt.Blue.Center", group="pmtischler")
     public static class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.BLUE;
@@ -42,7 +42,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         }
     }
 
-    @Autonomous(name="pmt.Auto.Blue.Corner", group="pmtischler")
+    @Autonomous(name="pmt.Blue.Corner", group="pmtischler")
     public static class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.BLUE;
