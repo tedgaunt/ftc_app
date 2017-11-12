@@ -55,10 +55,25 @@ public abstract class RobotHardware extends OpMode {
 
     /**
      * Sets the drive chain power from Mecanum motion.
+     * Maintains relative speeds when changing angles.
      * @param motion The desired Mecanum motion.
      */
     protected void setDriveForMecanum(Mecanum.Motion motion) {
         Mecanum.Wheels wheels = Mecanum.motionToWheels(motion);
+        setPower(MotorName.DRIVE_FRONT_LEFT, wheels.frontLeft);
+        setPower(MotorName.DRIVE_BACK_LEFT, wheels.frontRight);
+        setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.backLeft);
+        setPower(MotorName.DRIVE_BACK_RIGHT, wheels.backRight);
+    }
+
+    /**
+     * Sets the drive chain power from Mecanum motion.
+     * Uses max power output while changing speeds at angle motions.
+     * @param motion The desired Mecanum motion.
+     */
+    protected void setDriveForMecanumForSpeed(Mecanum.Motion motion) {
+        Mecanum.Wheels wheels = Mecanum.motionToWheels(motion).scaleWheelPower(
+                Math.sqrt(2));
         setPower(MotorName.DRIVE_FRONT_LEFT, wheels.frontLeft);
         setPower(MotorName.DRIVE_BACK_LEFT, wheels.frontRight);
         setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.backLeft);
@@ -238,7 +253,7 @@ public abstract class RobotHardware extends OpMode {
     // All color sensors on the robot, in order of ColorSensorName.
     private ArrayList<ColorSensor> allColorSensors;
 
-    // Per robot configuration parameters.
+    // Per robot tuning parameters.
     private String vuforiaLicenseKey;
     private double raisedJewelAngle;
     private double loweredJewelAngle;

@@ -77,10 +77,23 @@ public class Mecanum {
          */
         public Wheels(double frontLeft, double frontRight,
                       double backLeft, double backRight) {
-            this.frontLeft = frontLeft;
-            this.frontRight = frontRight;
-            this.backLeft = backLeft;
-            this.backRight = backRight;
+            List<Double> powers = Arrays.asList(frontLeft, frontRight,
+                                                backLeft, backRight);
+            clampPowers(powers);
+
+            this.frontLeft = powers.get(0);
+            this.frontRight = powers.get(1);
+            this.backLeft = powers.get(2);
+            this.backRight = powers.get(3);
+        }
+
+        /**
+         * Scales the wheel powers by the given factor.
+         * @param scalar The wheel power scaling factor.
+         */
+        public Wheels scaleWheelPower(double scalar) {
+            return new Wheels(frontLeft * scalar, frontRight * scalar,
+                              backLeft * scalar, backRight * scalar);
         }
     }
 
@@ -98,11 +111,8 @@ public class Mecanum {
         double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
         double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
         double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
-        List<Double> motors = Arrays.asList(frontLeft, frontRight,
-                                            backLeft, backRight);
-        clampPowers(motors);
-        return new Wheels(motors.get(0), motors.get(1),
-                          motors.get(2), motors.get(3));
+        return new Wheels(frontLeft, frontRight,
+                          backLeft, backRight);
     }
 
     /**
