@@ -1,10 +1,5 @@
 package com.github.pmtischler.vision;
 
-import android.content.Context;
-import android.content.res.Resources;
-
-import com.github.pmtischler.R;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -26,7 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  *   private SimpleVuforia vuforia;
  *
  *   public void init() {
- *       vuforia = new SimpleVuforia(hardwareMap.appContext);
+ *       String vuforiaKey = "...";
+ *       vuforia = new SimpleVuforia(vuforiaKey);
  *   }
  *
  *   public void loop() {
@@ -39,11 +35,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 public class SimpleVuforia {
     /**
      * Creates a Vuforia localizer and starts localization.
-     * @param context The app context used to load the Vuforia key.
+     * @param vuforiaLicenseKey The license key to access Vuforia code.
      */
-    public SimpleVuforia(Context context) {
+    public SimpleVuforia(String vuforiaLicenseKey) {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-        parameters.vuforiaLicenseKey = SimpleVuforia.getLicenseKey(context);
+        parameters.vuforiaLicenseKey = vuforiaLicenseKey;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         vuforia = ClassFactory.createVuforiaLocalizer(parameters);
@@ -59,12 +55,6 @@ public class SimpleVuforia {
         return RelicRecoveryVuMark.from(relicTemplate);
     }
 
-    /**
-     * Gets the Vuforia license key.
-     */
-    static public String getLicenseKey(Context context) {
-        return context.getResources().getString(R.string.vuforia_key);
-    }
 
     // The external Vuforia ID localizer.
     private VuforiaLocalizer vuforia;

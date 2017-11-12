@@ -1,5 +1,9 @@
 package com.github.pmtischler.opmode;
 
+import android.content.Context;
+import android.content.res.Resources;
+
+import com.github.pmtischler.R;
 import com.github.pmtischler.base.Color;
 import com.github.pmtischler.control.Mecanum;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -12,8 +16,16 @@ import java.util.ArrayList;
  * Hardware Abstraction Layer for Robot.
  * Provides common variables and functions for the hardware.
  * The robot configuration in the app should match enum names.
+ * Per-robot customization configured in SharedCode/src/main/res/values/.
  */
 public abstract class RobotHardware extends OpMode {
+    /**
+     * Gets the Vuforia license key.
+     */
+    public String getVuforiaLicenseKey() {
+        return hardwareMap.appContext.getResources().getString(R.string.vuforia_key);
+    }
+
     // The motors on the robot.
     public enum MotorName {
         DRIVE_FRONT_LEFT,

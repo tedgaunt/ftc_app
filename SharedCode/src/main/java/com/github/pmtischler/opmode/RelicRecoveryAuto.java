@@ -106,7 +106,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     public class DetectVuforia implements StateMachine.State {
         public DetectVuforia(StateMachine.State next) {
             this.next = next;
-            vuforia = new SimpleVuforia(hardwareMap.appContext);
+            vuforia = new SimpleVuforia(getVuforiaLicenseKey());
         }
 
         @Override
