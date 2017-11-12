@@ -11,6 +11,20 @@ public class MecanumTest {
     private static final double diffThresh = 0.001;
 
     /**
+     * Asserts that the angles are equal.
+     */
+    private void assertAnglesEqual(double expected, double actual,
+                                   double diffThresh) {
+        if (expected < 0) {
+            expected += (Math.PI * 2);
+        }
+        if (actual < 0) {
+            actual += (Math.PI * 2);
+        }
+        assertEquals(expected, actual, diffThresh);
+    }
+
+    /**
      * Asserts that the input controls yields the expected motion.
      */
     private void assertMotion(double leftStickX, double leftStickY,
@@ -20,7 +34,7 @@ public class MecanumTest {
                 leftStickX, leftStickY,
                 rightStickX, rightStickY);
         assertEquals(vD, motion.vD, diffThresh);
-        assertEquals(thetaD, motion.thetaD, diffThresh);
+        assertAnglesEqual(thetaD, motion.thetaD, diffThresh);
         assertEquals(vTheta, motion.vTheta, diffThresh);
     }
 
@@ -34,7 +48,7 @@ public class MecanumTest {
         // Right.
         assertMotion(1, 0,
                      0, 0,
-                     1, Math.PI / 2, 0);
+                     1, -Math.PI / 2, 0);
         // Back.
         assertMotion(0, -1,
                      0, 0,
@@ -42,12 +56,12 @@ public class MecanumTest {
         // Left.
         assertMotion(-1, 0,
                      0, 0,
-                     1, - Math.PI / 2, 0);
+                     1, Math.PI / 2, 0);
 
         // Front right.
         assertMotion(1, 1,
                      0, 0,
-                     Math.sqrt(2), Math.PI / 4, 0);
+                     Math.sqrt(2), -Math.PI / 4, 0);
     }
 
     @Test
@@ -85,7 +99,7 @@ public class MecanumTest {
                      0.7071, 0.7071,
                      0.7071, 0.7071);
         // Right.
-        assertWheels(1, Math.PI / 2, 0,
+        assertWheels(1, -Math.PI / 2, 0,
                      0.7071, -0.7071,
                      -0.7071, 0.7071);
         // Back.
@@ -93,12 +107,12 @@ public class MecanumTest {
                      -0.7071, -0.7071,
                      -0.7071, -0.7071);
         // Left.
-        assertWheels(1, 3 * Math.PI / 2, 0,
+        assertWheels(1, Math.PI / 2, 0,
                      -0.7071, 0.7071,
                      0.7071, -0.7071);
 
         // Front right.
-        assertWheels(1, Math.PI / 4, 0,
+        assertWheels(1, -Math.PI / 4, 0,
                      1, 0,
                      0, 1);
     }
@@ -107,11 +121,11 @@ public class MecanumTest {
     // Test Mecanum for turning.
     public void testMecanumWheelTurning() throws Exception {
         // Right.
-        assertWheels(0, 0, 1,
+        assertWheels(0, 0, -1,
                      1, -1,
                      1, -1);
         // Left.
-        assertWheels(0, 0, -1,
+        assertWheels(0, 0, 1,
                      -1, 1,
                      -1, 1);
     }
@@ -120,7 +134,7 @@ public class MecanumTest {
     // Test Mecanum for moving and turning to clamp motors.
     public void testMecanumWheelClamping() throws Exception {
         // Forward and full right.
-        assertWheels(1, 0, 1,
+        assertWheels(1, 0, -1,
                      1, -0.1716,
                      1, -0.1716);
     }

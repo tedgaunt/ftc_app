@@ -13,12 +13,15 @@ Control of a Mecanum Drive
 <http://thinktank.wpi.edu/resources/346/ControllingMecanumDrive.pdf>`__ for
 details.
 
+The following mathematical description uses a robot frame where :math:`x` is
+forward and :math:`y` is to the left.
+
 .. math::
 
-    V_{front,left} &= V_d sin \left ( \theta_d + \frac{\pi}{4} \right ) + V_\theta \\
-    V_{front,right} &= V_d cos \left ( \theta_d + \frac{\pi}{4} \right ) - V_\theta \\
-    V_{back,left} &= V_d cos \left ( \theta_d + \frac{\pi}{4} \right ) + V_\theta \\
-    V_{back,right} &= V_d sin \left ( \theta_d + \frac{\pi}{4} \right ) - V_\theta
+    V_{front,left} &= V_d sin \left ( -\theta_d + \frac{\pi}{4} \right ) - V_\theta \\
+    V_{front,right} &= V_d cos \left ( -\theta_d + \frac{\pi}{4} \right ) + V_\theta \\
+    V_{back,left} &= V_d cos \left ( -\theta_d + \frac{\pi}{4} \right ) - V_\theta \\
+    V_{back,right} &= V_d sin \left ( -\theta_d + \frac{\pi}{4} \right ) + V_\theta
 
 ================ ===================================================
 Variable         Description
@@ -40,7 +43,7 @@ for joysticks :math:`J_x`.
 .. math::
 
     V_d &= \sqrt{J_{left, x}^2 + J_{left, y}^2} \\
-    \theta_d &= arctan(J_{left, x}, J_{left y}) \\
+    \theta_d &= arctan(-J_{left, x}, J_{left y}) \\
     V_\theta &= -J_{right, x}
 
 These functions don't account for bounded outputs. That is, the joystick inputs

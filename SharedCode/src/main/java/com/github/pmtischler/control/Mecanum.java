@@ -10,11 +10,6 @@ import java.util.List;
  *   V_d = desired robot speed.
  *   theta_d = desired robot velocity angle.
  *   V_theta = desired robot rotational speed.
- * Characteristic equations:
- *   V_{front,left} = V_d sin(theta_d + pi/4) + V_theta
- *   V_{front,right} = V_d cos(theta_d + pi/4) - V_theta
- *   V_{back,left} = V_d cos(theta_d + pi/4) + V_theta
- *   V_{back,right} = V_d sin(theta_d + pi/4) - V_theta
  *
  *  Example:
  *    // Convert joysticks to wheel powers.
@@ -61,7 +56,7 @@ public class Mecanum {
                                           double rightStickY) {
         double vD = Math.sqrt(Math.pow(leftStickX, 2) +
                               Math.pow(leftStickY, 2));
-        double thetaD = Math.atan2(leftStickX, leftStickY);
+        double thetaD = Math.atan2(-leftStickX, leftStickY);
         double vTheta = -rightStickX;
         return new Motion(vD, thetaD, vTheta);
     }
@@ -98,10 +93,10 @@ public class Mecanum {
         double thetaD = motion.thetaD;
         double vTheta = motion.vTheta;
 
-        double frontLeft = vD * Math.sin(thetaD + Math.PI / 4) + vTheta;
-        double frontRight  = vD * Math.cos(thetaD + Math.PI / 4) - vTheta;
-        double backLeft = vD * Math.cos(thetaD + Math.PI / 4) + vTheta;
-        double backRight = vD * Math.sin(thetaD + Math.PI / 4) - vTheta;
+        double frontLeft = vD * Math.sin(-thetaD + Math.PI / 4) - vTheta;
+        double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
+        double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
+        double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
         List<Double> motors = Arrays.asList(frontLeft, frontRight,
                                             backLeft, backRight);
         clampPowers(motors);
