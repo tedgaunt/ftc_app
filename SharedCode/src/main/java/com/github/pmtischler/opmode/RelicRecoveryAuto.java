@@ -5,6 +5,7 @@ import com.github.pmtischler.base.Color;
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
 import com.github.pmtischler.control.Mecanum;
+import com.github.pmtischler.control.Pid;
 import com.github.pmtischler.vision.SimpleVuforia;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -221,7 +222,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     // Drives a specific motion for a specific amount of time.
     private class DriveForTime implements StateMachine.State {
         public DriveForTime(Mecanum.Motion motion, double duration,
-                                  StateMachine.State next) {
+                            StateMachine.State next) {
             this.motion = motion;
             this.duration = duration;
             this.next = next;
@@ -288,6 +289,90 @@ public class RelicRecoveryAuto extends RobotHardware {
         return driveOff;
     }
 
+    // Drives towards a position on the map using distance sensor readings.
+    // Assumes the robot is in the correct orientation and square with the field.
+    private class NavigateViaDistance implements StateMachine.State {
+        public NavigateViaDistance(StateMachine.State next) {
+            this.next = next;
+
+            targetFrontDistCm = cryptoFrontDistCm;
+            targetSideDistCm = cryptoSideDistCm;
+            if (robotColor == Color.Ftc.RED) {
+                sideSensor = DistanceSensorName.RIGHT;
+            } else {
+                sideSensor = DistanceSensorName.LEFT;
+            }
+
+            double kp = 1.0 / 80.0;    // 50% power at 40cm.
+            double ti = 1.0;           // 1s to eliminate past errors.
+            double td = 0.1;           // 0.1s to predict future error.
+            double integralMax = 0.1;  // Clamp integral at 10% power.
+            frontPid = new Pid(kp, ti, td, -integralMax, integralMax);
+            sidePid = new Pid(kp, ti, td, -integralMax, integralMax);
+        }
+
+        @Override
+        public void start() {
+            lastTime = time;
+            lastTimeOutsideRange = time;
+        }
+
+        @Override
+        public State update() {
+            double dt = time - lastTime;
+            double frontCm = getDistanceSensorCm(DistanceSensorName.FRONT);
+            double sideCm = getDistanceSensorCm(sideSensor);
+            double totalCm = Math.sqrt(
+                    Math.pow(frontCm, 2) + Math.pow(sideCm, 2));
+
+            telemetry.addData("Front Dist (cm)", frontCm);
+            telemetry.addData("Side Dist (cm)", sideCm);
+            telemetry.addData("Total Dist (cm)", totalCm);
+
+            if (totalCm > targetSatisfyDistCm) {
+                lastTimeOutsideRange = time;
+            }
+            if (time - lastTimeOutsideRange >= 2.0) {
+                // Settled in target position, done navigating.
+                setDriveForMecanum(new Mecanum.Motion(0, 0, 0));
+                return next;
+            }
+
+            double frontPower = frontPid.update(targetFrontDistCm, frontCm, dt);
+            double sidePower = sidePid.update(targetSideDistCm, sideCm, dt);
+            if (sideSensor == DistanceSensorName.RIGHT) {
+                // Right sensor faces -Y.
+                sidePower = sidePower * -1;
+            }
+            double totalPower = Math.sqrt(
+                    Math.pow(frontPower, 2) + Math.pow(sidePower, 2));
+            double powerAngle = Math.atan2(sidePower, frontPower);
+
+            setDriveForMecanum(new Mecanum.Motion(totalPower, powerAngle, 0));
+
+            lastTime = time;
+            return this;
+        }
+
+        private StateMachine.State next;
+
+        // Dist from target where it's considered satisfied.
+        private double targetSatisfyDistCm;
+        // Last iteration time for dt.
+        private double lastTime;
+        // Last time out of target range.
+        private double lastTimeOutsideRange;
+        // Target distance readings.
+        private double targetFrontDistCm;
+        private double targetSideDistCm;
+        // Side sensor name.
+        private DistanceSensorName sideSensor;
+
+        private Pid frontPid;
+        private Pid sidePid;
+    }
+
+
     // The state machine.
     private StateMachine machine;
     // The robot's color.
@@ -301,4 +386,9 @@ public class RelicRecoveryAuto extends RobotHardware {
     // Seconds to drive off platform and turn.
     private double driveOffSec;
     private double turnTowardSec;
+    // Target distance readings to navigate to cryptobox.
+    // TODO: Support 12 values (4 start pos, 3 goals).
+    // TODO: Load this from res.
+    private double cryptoFrontDistCm = 30;
+    private double cryptoSideDistCm = 100;
 }
