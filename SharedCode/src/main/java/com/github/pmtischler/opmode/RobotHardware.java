@@ -1,5 +1,9 @@
 package com.github.pmtischler.opmode;
 
+import com.github.pmtischler.R;
+import com.github.pmtischler.base.Color;
+import com.github.pmtischler.control.Mecanum;
+
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -12,10 +16,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import com.github.pmtischler.R;
-import com.github.pmtischler.base.Color;
-import com.github.pmtischler.control.Mecanum;
 
 /**
  * Hardware Abstraction Layer for Robot.
