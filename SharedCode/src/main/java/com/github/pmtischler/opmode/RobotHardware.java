@@ -19,13 +19,6 @@ import java.util.ArrayList;
  * Per-robot customization configured in SharedCode/src/main/res/values/.
  */
 public abstract class RobotHardware extends OpMode {
-    /**
-     * Gets the Vuforia license key.
-     */
-    public String getVuforiaLicenseKey() {
-        return hardwareMap.appContext.getResources().getString(R.string.vuforia_key);
-    }
-
     // The motors on the robot.
     public enum MotorName {
         DRIVE_FRONT_LEFT,
@@ -39,7 +32,7 @@ public abstract class RobotHardware extends OpMode {
      * @param motor The motor to modify.
      * @param power The power to set [-1, 1].
      */
-    public void setPower(MotorName motor, double power) {
+    protected void setPower(MotorName motor, double power) {
         DcMotor m = allMotors.get(motor.ordinal());
         if (m == null) {
             telemetry.addData("Motor Missing", motor.name());
@@ -53,7 +46,7 @@ public abstract class RobotHardware extends OpMode {
      * @param left The power for the left two motors.
      * @param right The power for the right two motors.
      */
-    public void setDriveForTank(double left, double right) {
+    protected void setDriveForTank(double left, double right) {
         setPower(MotorName.DRIVE_FRONT_LEFT, left);
         setPower(MotorName.DRIVE_BACK_LEFT, left);
         setPower(MotorName.DRIVE_FRONT_RIGHT, right);
@@ -64,7 +57,7 @@ public abstract class RobotHardware extends OpMode {
      * Sets the drive chain power from Mecanum motion.
      * @param motion The desired Mecanum motion.
      */
-    public void setDriveForMecanum(Mecanum.Motion motion) {
+    protected void setDriveForMecanum(Mecanum.Motion motion) {
         Mecanum.Wheels wheels = Mecanum.motionToWheels(motion);
         setPower(MotorName.DRIVE_FRONT_LEFT, wheels.frontLeft);
         setPower(MotorName.DRIVE_BACK_LEFT, wheels.frontRight);
@@ -73,7 +66,7 @@ public abstract class RobotHardware extends OpMode {
     }
 
     // The servos on the robot.
-    public enum ServoName {
+    protected enum ServoName {
         JEWEL_DROP,
         JEWEL_HIT,
     }
@@ -83,7 +76,7 @@ public abstract class RobotHardware extends OpMode {
      * @param servo The servo to modify.
      * @param position The angle to set [0, 1].
      */
-    public void setAngle(ServoName servo, double position) {
+    protected void setAngle(ServoName servo, double position) {
         Servo s = allServos.get(servo.ordinal());
         if (s == null) {
             telemetry.addData("Servo Missing", servo.name());
@@ -93,32 +86,32 @@ public abstract class RobotHardware extends OpMode {
     }
 
     // Raises the jewel arm.
-    public void raiseJewelArm() {
-        setAngle(ServoName.JEWEL_DROP, 1);
+    protected void raiseJewelArm() {
+        setAngle(ServoName.JEWEL_DROP, raisedJewelAngle);
     }
 
     // Lowers the jewel arm.
-    public void lowerJewelArm() {
-        setAngle(ServoName.JEWEL_DROP, 0);
+    protected void lowerJewelArm() {
+        setAngle(ServoName.JEWEL_DROP, loweredJewelAngle);
     }
 
     // Centers the jewel arm.
-    public void centerJewelArm() {
-        setAngle(ServoName.JEWEL_HIT, 0.5);
+    protected void centerJewelArm() {
+        setAngle(ServoName.JEWEL_HIT, centerJewelAngle);
     }
 
     // Moves the jewel arm forward.
-    public void forwardJewelArm() {
-        setAngle(ServoName.JEWEL_HIT, 1);
+    protected void forwardJewelArm() {
+        setAngle(ServoName.JEWEL_HIT, forwardJewelAngle);
     }
 
     // Moves the jewel arm backward.
-    public void backwardJewelArm() {
-        setAngle(ServoName.JEWEL_HIT, 0);
+    protected void backwardJewelArm() {
+        setAngle(ServoName.JEWEL_HIT, backwardJewelAngle);
     }
 
     // The color sensors on the robot.
-    public enum ColorSensorName {
+    protected enum ColorSensorName {
         JEWEL,
     }
 
@@ -127,7 +120,7 @@ public abstract class RobotHardware extends OpMode {
      * @param sensor The sensor to read.
      * @param color The color channel to read intensity.
      */
-    public int getColorSensor(ColorSensorName sensor, Color.Channel color) {
+    protected int getColorSensor(ColorSensorName sensor, Color.Channel color) {
         ColorSensor s = allColorSensors.get(sensor.ordinal());
         if (s == null) {
             telemetry.addData("Color Sensor Missing", sensor.name());
@@ -148,7 +141,7 @@ public abstract class RobotHardware extends OpMode {
      * @param sensor The sensor to set the LED power.
      * @param enabled Whether to turn the LED on.
      */
-    public void setColorSensorLedEnabled(ColorSensorName sensor,
+    protected void setColorSensorLedEnabled(ColorSensorName sensor,
                                          boolean enabled) {
         ColorSensor s = allColorSensors.get(sensor.ordinal());
         if (s == null) {
@@ -159,15 +152,35 @@ public abstract class RobotHardware extends OpMode {
     }
 
     // Possible starting positions.
-    public enum StartPosition {
+    protected enum StartPosition {
         FIELD_CENTER,
         FIELD_CORNER,
+    }
+
+    /**
+     * Gets the Vuforia license key.
+     */
+    protected String getVuforiaLicenseKey() {
+        return vuforiaLicenseKey;
     }
 
     /**
      * Initialize the hardware handles.
      */
     public void init() {
+        vuforiaLicenseKey = hardwareMap.appContext.getResources().getString(
+                R.string.vuforia_key);
+        raisedJewelAngle = hardwareMap.appContext.getResources().getInteger(
+                R.integer.raised_jewel_angle) / 100.0;
+        loweredJewelAngle = hardwareMap.appContext.getResources().getInteger(
+                R.integer.lowered_jewel_angle) / 100.0;
+        centerJewelAngle = hardwareMap.appContext.getResources().getInteger(
+                R.integer.center_jewel_angle) / 100.0;
+        forwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
+                R.integer.forward_jewel_angle) / 100.0;
+        backwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
+                R.integer.backward_jewel_angle) / 100.0;
+
         allMotors = new ArrayList<DcMotor>();
         for (MotorName m : MotorName.values()) {
             try {
@@ -224,4 +237,12 @@ public abstract class RobotHardware extends OpMode {
     private ArrayList<Servo> allServos;
     // All color sensors on the robot, in order of ColorSensorName.
     private ArrayList<ColorSensor> allColorSensors;
+
+    // Per robot configuration parameters.
+    private String vuforiaLicenseKey;
+    private double raisedJewelAngle;
+    private double loweredJewelAngle;
+    private double centerJewelAngle;
+    private double forwardJewelAngle;
+    private double backwardJewelAngle;
 }
