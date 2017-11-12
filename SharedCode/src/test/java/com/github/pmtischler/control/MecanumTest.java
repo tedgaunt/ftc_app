@@ -61,7 +61,7 @@ public class MecanumTest {
         // Front right.
         assertMotion(1, 1,
                      0, 0,
-                     Math.sqrt(2), -Math.PI / 4, 0);
+                     1, -Math.PI / 4, 0);
     }
 
     @Test
