@@ -265,7 +265,6 @@ public abstract class RobotHardware extends OpMode {
             }
         }
 
-        setColorSensorLedEnabled(ColorSensorName.JEWEL, true);
         raiseJewelArm();
         centerJewelArm();
     }

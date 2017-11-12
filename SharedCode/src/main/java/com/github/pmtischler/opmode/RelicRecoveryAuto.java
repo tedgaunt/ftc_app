@@ -153,6 +153,7 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         @Override
         public State update() {
+            setColorSensorLedEnabled(ColorSensorName.JEWEL, true);
             lowerJewelArm();
             return new WaitForDuration(2, next);
         }
@@ -184,6 +185,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                 // Reading our team's jewel in forward position.
                 backwardJewelArm();
             }
+            setColorSensorLedEnabled(ColorSensorName.JEWEL, false);
             return new WaitForDuration(1, next);
         }
 
