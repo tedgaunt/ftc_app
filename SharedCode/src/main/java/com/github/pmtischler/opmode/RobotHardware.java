@@ -171,15 +171,15 @@ public abstract class RobotHardware extends OpMode {
         vuforiaLicenseKey = hardwareMap.appContext.getResources().getString(
                 R.string.vuforia_key);
         raisedJewelAngle = hardwareMap.appContext.getResources().getInteger(
-                R.integer.raised_jewel_angle) / 100.0;
+                R.integer.raised_jewel_angle_percent) / 100.0;
         loweredJewelAngle = hardwareMap.appContext.getResources().getInteger(
-                R.integer.lowered_jewel_angle) / 100.0;
+                R.integer.lowered_jewel_angle_percent) / 100.0;
         centerJewelAngle = hardwareMap.appContext.getResources().getInteger(
-                R.integer.center_jewel_angle) / 100.0;
+                R.integer.center_jewel_angle_percent) / 100.0;
         forwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
-                R.integer.forward_jewel_angle) / 100.0;
+                R.integer.forward_jewel_angle_percent) / 100.0;
         backwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
-                R.integer.backward_jewel_angle) / 100.0;
+                R.integer.backward_jewel_angle_percent) / 100.0;
 
         allMotors = new ArrayList<DcMotor>();
         for (MotorName m : MotorName.values()) {
