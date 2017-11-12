@@ -1,16 +1,21 @@
 package com.github.pmtischler.opmode;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.res.Resources;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import com.github.pmtischler.R;
 import com.github.pmtischler.base.Color;
 import com.github.pmtischler.control.Mecanum;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import java.util.ArrayList;
 
 /**
  * Hardware Abstraction Layer for Robot.
@@ -166,6 +171,27 @@ public abstract class RobotHardware extends OpMode {
         }
     }
 
+    // The distance sensors on the robot.
+    protected enum DistanceSensorName {
+        LEFT,
+        FRONT,
+        RIGHT,
+    }
+
+    /**
+     * Gets the distance value on the sensor in centimeters.
+     * Returns -1 when the sensor is unavailable.
+     * @param sensor The sensor to read.
+     */
+    protected double getDistanceSensorCm(DistanceSensorName sensor) {
+        DistanceSensor s = allDistanceSensors.get(sensor.ordinal());
+        if (s == null) {
+            telemetry.addData("Distance Sensor Missing", sensor.name());
+            return -1;
+        }
+        return s.getDistance(DistanceUnit.CM);
+    }
+
     // Possible starting positions.
     protected enum StartPosition {
         FIELD_CENTER,
@@ -227,6 +253,18 @@ public abstract class RobotHardware extends OpMode {
             }
         }
 
+        allDistanceSensors = new ArrayList<DistanceSensor>();
+        for (DistanceSensorName s : DistanceSensorName.values()) {
+            try {
+                allDistanceSensors.add(hardwareMap.get(
+                            ModernRoboticsI2cRangeSensor.class,
+                            s.name()));
+            } catch (Exception e) {
+                telemetry.addData("Distance Sensor Missing", s.name());
+                allDistanceSensors.add(null);
+            }
+        }
+
         setColorSensorLedEnabled(ColorSensorName.JEWEL, true);
         raiseJewelArm();
         centerJewelArm();
@@ -252,6 +290,8 @@ public abstract class RobotHardware extends OpMode {
     private ArrayList<Servo> allServos;
     // All color sensors on the robot, in order of ColorSensorName.
     private ArrayList<ColorSensor> allColorSensors;
+    // All distance sensors on the robot, in order of DistanceSensorName.
+    private ArrayList<DistanceSensor> allDistanceSensors;
 
     // Per robot tuning parameters.
     private String vuforiaLicenseKey;
