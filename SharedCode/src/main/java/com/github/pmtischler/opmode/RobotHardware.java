@@ -66,8 +66,8 @@ public abstract class RobotHardware extends OpMode {
     protected void setDriveForMecanum(Mecanum.Motion motion) {
         Mecanum.Wheels wheels = Mecanum.motionToWheels(motion);
         setPower(MotorName.DRIVE_FRONT_LEFT, wheels.frontLeft);
-        setPower(MotorName.DRIVE_BACK_LEFT, wheels.frontRight);
-        setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.backLeft);
+        setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.frontRight);
+        setPower(MotorName.DRIVE_BACK_LEFT, wheels.backLeft);
         setPower(MotorName.DRIVE_BACK_RIGHT, wheels.backRight);
     }
 
@@ -80,8 +80,8 @@ public abstract class RobotHardware extends OpMode {
         Mecanum.Wheels wheels = Mecanum.motionToWheels(motion).scaleWheelPower(
                 Math.sqrt(2));
         setPower(MotorName.DRIVE_FRONT_LEFT, wheels.frontLeft);
-        setPower(MotorName.DRIVE_BACK_LEFT, wheels.frontRight);
-        setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.backLeft);
+        setPower(MotorName.DRIVE_FRONT_RIGHT, wheels.frontRight);
+        setPower(MotorName.DRIVE_BACK_LEFT, wheels.backLeft);
         setPower(MotorName.DRIVE_BACK_RIGHT, wheels.backRight);
     }
 
