@@ -340,8 +340,8 @@ public class RelicRecoveryAuto extends RobotHardware {
                 return next;
             }
 
-            double frontPower = frontPid.update(targetFrontDistCm, frontCm, dt);
-            double sidePower = sidePid.update(targetSideDistCm, sideCm, dt);
+            double frontPower = -frontPid.update(targetFrontDistCm, frontCm, dt);
+            double sidePower = -sidePid.update(targetSideDistCm, sideCm, dt);
             if (sideSensor == DistanceSensorName.RIGHT) {
                 // Right sensor faces -Y.
                 sidePower = sidePower * -1;
@@ -359,7 +359,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         private StateMachine.State next;
 
         // Dist from target where it's considered satisfied.
-        private double targetSatisfyDistCm;
+        private double targetSatisfyDistCm = 5;
         // Last iteration time for dt.
         private double lastTime;
         // Last time out of target range.
