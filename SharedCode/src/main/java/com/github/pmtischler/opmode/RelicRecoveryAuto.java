@@ -251,6 +251,8 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     private StateMachine.State newDriveToCryptobox(StateMachine.State next) {
+        StateMachine.State driveToColumn = new NavigateViaDistance(next);
+
         StateMachine.State turnToFace;
         if (robotColor == Color.Ftc.RED) {
             if (robotStartPos == StartPosition.FIELD_CENTER) {
@@ -260,19 +262,19 @@ public class RelicRecoveryAuto extends RobotHardware {
                 // Red corner turns right.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, -0.5),
-                        turnTowardSec, next);
+                        turnTowardSec, driveToColumn);
             }
         } else {
             if (robotStartPos == StartPosition.FIELD_CENTER) {
                 // Blue center turns around.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, 0.5),
-                        turnTowardSec * 2, next);
+                        turnTowardSec * 2, driveToColumn);
             } else {
                 // Blue corner turns right.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, -0.5),
-                        turnTowardSec, next);
+                        turnTowardSec, driveToColumn);
             }
         }
 
