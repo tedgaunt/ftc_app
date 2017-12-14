@@ -337,6 +337,17 @@ public class RelicRecoveryAuto extends RobotHardware {
             telemetry.addData("Side Dist (cm)", sideCm);
             telemetry.addData("Error Dist (cm)", errorDistCm);
 
+            // Check for noise values off the sensor.
+            List<Double> dists = Arrays.asList(frontCm, sideCm);
+            for (Double d : dists) {
+                if (d.isNan() || d < noiseDistMin || d > noiseDistMax) {
+                    // Need non-noise values to navigate.
+                    telemetry.addData("Invalid/Noise Dist (cm)", d);
+                    return this;
+                }
+            }
+
+            // Check if the robot has stayed at goal for required time.
             if (errorDistCm > targetSatisfyDistCm) {
                 lastTimeOutsideRange = time;
             }
@@ -346,6 +357,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                 return next;
             }
 
+            // Determine motor powers based on dist sensors and control loops.
             double frontPower = -frontPid.update(targetFrontDistCm, frontCm, dt);
             double sidePower = -sidePid.update(targetSideDistCm, sideCm, dt);
             if (sideSensor == DistanceSensorName.RIGHT) {
@@ -366,6 +378,9 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         // Dist from target where it's considered satisfied.
         private double targetSatisfyDistCm = 5;
+        // Dist bound read from sensor where it's considered noise.
+        private double noiseDistMin = 5;
+        private double noiseDistMax = 215;
         // Last iteration time for dt.
         private double lastTime;
         // Last time out of target range.
