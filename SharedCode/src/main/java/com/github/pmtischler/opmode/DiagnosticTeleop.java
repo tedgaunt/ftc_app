@@ -35,8 +35,10 @@ public class DiagnosticTeleop extends RelicRecoveryManual {
 
         telemetry.addData("Distance Left (cm)", getDistanceSensorCm(
                     DistanceSensorName.LEFT));
-        telemetry.addData("Distance Front (cm)", getDistanceSensorCm(
-                    DistanceSensorName.FRONT));
+        telemetry.addData("Distance Front Left (cm)", getDistanceSensorCm(
+                    DistanceSensorName.FRONT_LEFT));
+        telemetry.addData("Distance Front Right (cm)", getDistanceSensorCm(
+                    DistanceSensorName.FRONT_RIGHT));
         telemetry.addData("Distance Right (cm)", getDistanceSensorCm(
                     DistanceSensorName.RIGHT));
 

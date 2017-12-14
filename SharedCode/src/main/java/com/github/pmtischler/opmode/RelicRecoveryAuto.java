@@ -8,6 +8,9 @@ import com.github.pmtischler.control.Mecanum;
 import com.github.pmtischler.control.Pid;
 import com.github.pmtischler.vision.SimpleVuforia;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
@@ -305,17 +308,29 @@ public class RelicRecoveryAuto extends RobotHardware {
                 sideSensor = DistanceSensorName.LEFT;
             }
 
-            double kp = 0.5 / 20.0;    // 50% power at 20cm.
-            double ti = 1.0;           // 1s to eliminate past errors.
-            double td = 0.1;           // 0.1s to predict future error.
-            double integralMax = 1.0;  // Clamp integral at 100% of power.
-            double outputMax = 0.8;    // Clamp motor power at 100% of power.
-            frontPid = new Pid(kp, ti, td,
-                               -integralMax, integralMax,
-                               -outputMax, outputMax);
-            sidePid = new Pid(kp, ti, td,
-                              -integralMax, integralMax,
-                              -outputMax, outputMax);
+            {
+                double kp = 0.5 / 20.0;
+                double ti = 1.0;
+                double td = 0.1;
+                double integralMax = 1.0;
+                double outputMax = 0.8;
+                frontPid = new Pid(kp, ti, td,
+                                   -integralMax, integralMax,
+                                   -outputMax, outputMax);
+                sidePid = new Pid(kp, ti, td,
+                                  -integralMax, integralMax,
+                                  -outputMax, outputMax);
+            }
+            {
+                double kp = 0.5 / 20;
+                double ti = 1.0;
+                double td = 0.1;
+                double integralMax = 1.0;
+                double outputMax = 0.8;
+                rotatePid = new Pid(kp, ti, td,
+                                    -integralMax, integralMax,
+                                    -outputMax, outputMax);
+            }
         }
 
         @Override
@@ -327,20 +342,29 @@ public class RelicRecoveryAuto extends RobotHardware {
         @Override
         public State update() {
             double dt = time - lastTime;
-            double frontCm = getDistanceSensorCm(DistanceSensorName.FRONT);
+            double frontLeftCm = getDistanceSensorCm(
+                    DistanceSensorName.FRONT_LEFT);
+            double frontRightCm = getDistanceSensorCm(
+                    DistanceSensorName.FRONT_RIGHT);
+            double frontCm = (frontLeftCm + frontRightCm) / 2.0;
             double sideCm = getDistanceSensorCm(sideSensor);
             double errorDistCm = Math.sqrt(
                     Math.pow(frontCm - targetFrontDistCm, 2) +
                     Math.pow(sideCm - targetSideDistCm, 2));
+            double errorRotateDistCm = Math.abs(frontLeftCm - frontRightCm);
 
-            telemetry.addData("Front Dist (cm)", frontCm);
+            telemetry.addData("Front Left Dist (cm)", frontLeftCm);
+            telemetry.addData("Front Right Dist (cm)", frontRightCm);
+            telemetry.addData("Front Avg Dist (cm)", frontCm);
             telemetry.addData("Side Dist (cm)", sideCm);
             telemetry.addData("Error Dist (cm)", errorDistCm);
+            telemetry.addData("Error Rotate Dist (cm)", errorRotateDistCm);
 
             // Check for noise values off the sensor.
-            List<Double> dists = Arrays.asList(frontCm, sideCm);
+            List<Double> dists = Arrays.asList(frontLeftCm, frontRightCm,
+                                               frontCm, sideCm);
             for (Double d : dists) {
-                if (d.isNan() || d < noiseDistMin || d > noiseDistMax) {
+                if (d.isNaN() || d < noiseDistMin || d > noiseDistMax) {
                     // Need non-noise values to navigate.
                     telemetry.addData("Invalid/Noise Dist (cm)", d);
                     return this;
@@ -348,7 +372,8 @@ public class RelicRecoveryAuto extends RobotHardware {
             }
 
             // Check if the robot has stayed at goal for required time.
-            if (errorDistCm > targetSatisfyDistCm) {
+            if (errorDistCm > distDiffSatisfyCm ||
+                    errorRotateDistCm > rotateDiffSatisfyCm) {
                 lastTimeOutsideRange = time;
             }
             if (time - lastTimeOutsideRange >= 2.0) {
@@ -357,18 +382,22 @@ public class RelicRecoveryAuto extends RobotHardware {
                 return next;
             }
 
-            // Determine motor powers based on dist sensors and control loops.
+            // Determine translate motor powers.
             double frontPower = -frontPid.update(targetFrontDistCm, frontCm, dt);
             double sidePower = -sidePid.update(targetSideDistCm, sideCm, dt);
             if (sideSensor == DistanceSensorName.RIGHT) {
                 // Right sensor faces -Y.
                 sidePower = sidePower * -1;
             }
-            double totalPower = Math.sqrt(
+            double translatePower = Math.sqrt(
                     Math.pow(frontPower, 2) + Math.pow(sidePower, 2));
             double powerAngle = Math.atan2(sidePower, frontPower);
 
-            setDriveForMecanum(new Mecanum.Motion(totalPower, powerAngle, 0));
+            // Determine rotation motor powers.
+            double rotatePower = -rotatePid.update(frontLeftCm, frontRightCm, dt);
+
+            setDriveForMecanum(new Mecanum.Motion(
+                        translatePower, powerAngle, rotatePower));
 
             lastTime = time;
             return this;
@@ -377,10 +406,11 @@ public class RelicRecoveryAuto extends RobotHardware {
         private StateMachine.State next;
 
         // Dist from target where it's considered satisfied.
-        private double targetSatisfyDistCm = 5;
+        private double distDiffSatisfyCm = 5;
+        private double rotateDiffSatisfyCm = 5;
         // Dist bound read from sensor where it's considered noise.
-        private double noiseDistMin = 5;
-        private double noiseDistMax = 215;
+        private double noiseDistMin = 5;  // Too close.
+        private double noiseDistMax = 215;  // Too far.
         // Last iteration time for dt.
         private double lastTime;
         // Last time out of target range.
@@ -391,8 +421,10 @@ public class RelicRecoveryAuto extends RobotHardware {
         // Side sensor name.
         private DistanceSensorName sideSensor;
 
+        // Control loops for navigating.
         private Pid frontPid;
         private Pid sidePid;
+        private Pid rotatePid;
     }
 
 

@@ -174,7 +174,8 @@ public abstract class RobotHardware extends OpMode {
     // The distance sensors on the robot.
     protected enum DistanceSensorName {
         LEFT,
-        FRONT,
+        FRONT_LEFT,
+        FRONT_RIGHT,
         RIGHT,
     }
 
