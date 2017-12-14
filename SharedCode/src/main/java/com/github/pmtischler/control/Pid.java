@@ -12,14 +12,18 @@ public class Pid {
      * @param td The number of seconds to predict the error in the future.
      * @param integralMin The min of the running integral.
      * @param integralMax The max of the running integral.
+     * @param outputMin The min of the PID output.
+     * @param outputMax The max of the PID output.
      */
     public Pid(double kp, double ti, double td, double integralMin,
-               double integralMax) {
+               double integralMax, double outputMin, double outputMax) {
         this.kp = kp;
         this.ti = ti;
         this.td = td;
         this.integralMin = integralMin;
         this.integralMax = integralMax;
+        this.outputMin = outputMin;
+        this.outputMax = outputMax;
 
         this.previousError = 0;
         this.runningIntegral = 0;
@@ -37,7 +41,8 @@ public class Pid {
         runningIntegral = clampValue(runningIntegral + e * dt,
                                      integralMin, integralMax);
         double d = (e - previousError) / dt;
-        double output = kp * (e + (runningIntegral / ti) + (td * d));
+        double output = clampValue(kp * (e + (runningIntegral / ti) + (td * d)),
+                                   outputMin, outputMax);
 
         previousError = e;
         return output;
@@ -64,6 +69,10 @@ public class Pid {
     private double integralMin;
     // The max of the running integral.
     private double integralMax;
+    // The min allowed PID output.
+    private double outputMin;
+    // The max allowed PID output.
+    private double outputMax;
 
     // The last error value.
     private double previousError;

@@ -89,11 +89,12 @@ use case. Add the following member variables to the code.
 
 .. code-block:: java
 
-    private final double drivePidKp = 1;    // Tuning variable for PID.
-    private final double drivePidTi = 1.0;  // Eliminate integral error in 1 sec.
-    private final double drivePidTd = 0.1;  // Account for error in 0.1 sec.
+    private final double drivePidKp = 1;     // Tuning variable for PID.
+    private final double drivePidTi = 1.0;   // Eliminate integral error in 1 sec.
+    private final double drivePidTd = 0.1;   // Account for error in 0.1 sec.
     // Protect against integral windup by limiting integral term.
     private final double drivePidIntMax = maxWheelSpeed;  // Limit to max speed.
+    private final double driveOutMax = 1.0;  // Motor output limited to 100%.
 
 **PID Controller**. The custom code provides a
 :doc:`../javasphinx/com/github/pmtischler/control/Pid` class. This will be used
@@ -114,9 +115,11 @@ following code to use the Pid control.
         public void init() {
             // ... other code
             leftDrive = new Pid(drivePidKp, drivePidTi, drivePidTd,
-                                -drivePidIntMax, drivePidIntMax);
+                                -drivePidIntMax, drivePidIntMax,
+                                -driveOutMax, driveOutMax);
             rightDrive = new Pid(drivePidKp, drivePidTi, drivePidTd,
-                                 -drivePidIntMax, drivePidIntMax);
+                                 -drivePidIntMax, drivePidIntMax,
+                                 -driveOutMax, driveOutMax);
         }
 
         public void loop() {

@@ -309,8 +309,13 @@ public class RelicRecoveryAuto extends RobotHardware {
             double ti = 1.0;           // 1s to eliminate past errors.
             double td = 0.1;           // 0.1s to predict future error.
             double integralMax = 1.0;  // Clamp integral at 100% of power.
-            frontPid = new Pid(kp, ti, td, -integralMax, integralMax);
-            sidePid = new Pid(kp, ti, td, -integralMax, integralMax);
+            double outputMax = 0.8;    // Clamp motor power at 100% of power.
+            frontPid = new Pid(kp, ti, td,
+                               -integralMax, integralMax,
+                               -outputMax, outputMax);
+            sidePid = new Pid(kp, ti, td,
+                              -integralMax, integralMax,
+                              -outputMax, outputMax);
         }
 
         @Override
