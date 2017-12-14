@@ -324,14 +324,15 @@ public class RelicRecoveryAuto extends RobotHardware {
             double dt = time - lastTime;
             double frontCm = getDistanceSensorCm(DistanceSensorName.FRONT);
             double sideCm = getDistanceSensorCm(sideSensor);
-            double totalCm = Math.sqrt(
-                    Math.pow(frontCm, 2) + Math.pow(sideCm, 2));
+            double errorDistCm = Math.sqrt(
+                    Math.pow(frontCm - targetFrontDistCm, 2) +
+                    Math.pow(sideCm - targetSideDistCm, 2));
 
             telemetry.addData("Front Dist (cm)", frontCm);
             telemetry.addData("Side Dist (cm)", sideCm);
-            telemetry.addData("Total Dist (cm)", totalCm);
+            telemetry.addData("Error Dist (cm)", errorDistCm);
 
-            if (totalCm > targetSatisfyDistCm) {
+            if (errorDistCm > targetSatisfyDistCm) {
                 lastTimeOutsideRange = time;
             }
             if (time - lastTimeOutsideRange >= 2.0) {
