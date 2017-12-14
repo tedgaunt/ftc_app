@@ -42,7 +42,7 @@ public class MecanumTest {
     // Test Mecanum for direct strafing.
     public void testMecanumMotionStrafing() throws Exception {
         // Forward.
-        assertMotion(0, 1,
+        assertMotion(0, -1,
                      0, 0,
                      1, 0, 0);
         // Right.
@@ -50,7 +50,7 @@ public class MecanumTest {
                      0, 0,
                      1, -Math.PI / 2, 0);
         // Back.
-        assertMotion(0, -1,
+        assertMotion(0, 1,
                      0, 0,
                      1, Math.PI, 0);
         // Left.
@@ -59,7 +59,7 @@ public class MecanumTest {
                      1, Math.PI / 2, 0);
 
         // Front right.
-        assertMotion(1, 1,
+        assertMotion(1, -1,
                      0, 0,
                      1, -Math.PI / 4, 0);
     }
@@ -70,11 +70,11 @@ public class MecanumTest {
         // Left.
         assertMotion(0, 0,
                      -1, 0,
-                     0, 0, 1);
+                     0, Math.PI, 1);
         // Right.
         assertMotion(0, 0,
                      1, 0,
-                     0, 0, -1);
+                     0, Math.PI, -1);
     }
 
     /**
