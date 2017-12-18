@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 public abstract class RobotHardware extends OpMode {
     // The motors on the robot.
-    public enum MotorName {
+    protected enum MotorName {
         DRIVE_FRONT_LEFT,
         DRIVE_FRONT_RIGHT,
         DRIVE_BACK_LEFT,
@@ -197,6 +197,11 @@ public abstract class RobotHardware extends OpMode {
     protected enum StartPosition {
         FIELD_CENTER,
         FIELD_CORNER,
+    }
+
+    // Returns a string representation of the starting position.
+    String getStartPositionName(Color.Ftc c, StartPosition p) {
+        return c.name() + "-" + p.name();
     }
 
     /**

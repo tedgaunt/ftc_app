@@ -17,7 +17,7 @@ public class PlaybackAuto extends OpMode {
      */
     public void init() {
         try {
-            inputStream = hardwareMap.appContext.openFileInput("recordedTeleop");
+            inputStream = hardwareMap.appContext.openFileInput("PlaybackAuto");
             player = new BlackBox.Player(inputStream, hardwareMap);
         } catch (Exception e) {
             e.printStackTrace();

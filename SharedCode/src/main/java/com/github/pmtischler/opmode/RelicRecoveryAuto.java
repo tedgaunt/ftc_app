@@ -1,6 +1,7 @@
 package com.github.pmtischler.opmode;
 
 import com.github.pmtischler.R;
+import com.github.pmtischler.base.BlackBox;
 import com.github.pmtischler.base.Color;
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
@@ -8,6 +9,7 @@ import com.github.pmtischler.control.Mecanum;
 import com.github.pmtischler.control.Pid;
 import com.github.pmtischler.vision.SimpleVuforia;
 
+import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +72,9 @@ public class RelicRecoveryAuto extends RobotHardware {
         telemetry.addData("Robot Color", robotColor.name());
         telemetry.addData("Robot Start Position", robotStartPos.name());
 
-        StateMachine.State driveToCryptobox = newDriveToCryptobox(null);
+        StateMachine.State scoreGlyph = new BlackboxPlayback(
+                getStartPositionName(robotColor, robotStartPos), null);
+        StateMachine.State driveToCryptobox = newDriveToCryptobox(scoreGlyph);
         StateMachine.State hitJewel = newHitJewel(driveToCryptobox);
         StateMachine.State detectVuforia = new DetectVuforia(hitJewel);
         machine = new StateMachine(detectVuforia);
@@ -413,6 +417,40 @@ public class RelicRecoveryAuto extends RobotHardware {
         private Pid rotatePid;
     }
 
+    // Plays back a recorded blackbox stream.
+    private class BlackboxPlayback implements StateMachine.State {
+        public BlackboxPlayback(String filename, StateMachine.State next) {
+            try {
+                inputStream = hardwareMap.appContext.openFileInput(filename);
+                player = new BlackBox.Player(inputStream, hardwareMap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                requestOpModeStop();
+            }
+            this.next = next;
+        }
+
+        @Override
+        public void start() {}
+
+        @Override
+        public State update() {
+            try {
+                player.playback(time);
+            } catch (Exception e) {
+                e.printStackTrace();
+                requestOpModeStop();
+            }
+            // TODO: After playback complete, return next.
+            return this;
+        }
+
+        private StateMachine.State next;
+        // The input file stream.
+        private FileInputStream inputStream;
+        // The hardware player.
+        private BlackBox.Player player;
+    }
 
     // The state machine.
     private StateMachine machine;
