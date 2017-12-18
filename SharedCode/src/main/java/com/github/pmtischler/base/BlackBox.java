@@ -68,8 +68,9 @@ public class BlackBox {
         /**
          * Playbacks the hardware up to the time.
          * @param time The time to playback up to (seconds).
+         * @return True if playback is still running. False if it has completed.
          */
-        public void playback(double time) throws Exception {
+        public boolean playback(double time) throws Exception {
             List<TimeseriesStream.DataPoint> points = reader.readUntil(time);
             for (TimeseriesStream.DataPoint p : points) {
                 HardwareDevice device = hardware.get(p.varname);
@@ -82,6 +83,7 @@ public class BlackBox {
                     }
                 }
             }
+            return reader.readDone();
         }
 
         // The hardware to manipulate.

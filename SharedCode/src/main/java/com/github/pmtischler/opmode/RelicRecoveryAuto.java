@@ -436,13 +436,16 @@ public class RelicRecoveryAuto extends RobotHardware {
         @Override
         public State update() {
             try {
-                player.playback(time);
+                if (player.playback(time)) {
+                    return this;
+                } else {
+                    return next;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 requestOpModeStop();
+                return null;
             }
-            // TODO: After playback complete, return next.
-            return this;
         }
 
         private StateMachine.State next;

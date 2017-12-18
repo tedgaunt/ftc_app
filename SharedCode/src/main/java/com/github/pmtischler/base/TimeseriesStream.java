@@ -80,6 +80,7 @@ public class TimeseriesStream {
         public Reader(InputStream inputStream) throws Exception {
             this.inputStream = new ObjectInputStream(inputStream);
             nextPoint = null;
+            endOfStream = false;
         }
 
         /**
@@ -96,6 +97,7 @@ public class TimeseriesStream {
             try {
                 return (DataPoint)inputStream.readObject();
             } catch (EOFException e) {
+                endOfStream = true;
                 return null;
             }
         }
@@ -124,9 +126,16 @@ public class TimeseriesStream {
             }
         }
 
+        // Returns whether the time series read stream is complete.
+        public boolean readDone() {
+            return nextPoint == null && endOfStream;
+        }
+
         // The object input stream.
         private ObjectInputStream inputStream;
         // The next point to be returned.
         private DataPoint nextPoint;
+        // Whether the read is done.
+        private boolean endOfStream;
     }
 }
