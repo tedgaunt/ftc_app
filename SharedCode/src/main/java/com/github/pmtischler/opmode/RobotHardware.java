@@ -190,7 +190,7 @@ public abstract class RobotHardware extends OpMode {
             telemetry.addData("Distance Sensor Missing", sensor.name());
             return -1;
         }
-        return s.getDistance(DistanceUnit.CM);
+        return distanceSensorVals.get(sensor.ordinal());
     }
 
     // Possible starting positions.
@@ -255,6 +255,7 @@ public abstract class RobotHardware extends OpMode {
         }
 
         allDistanceSensors = new ArrayList<DistanceSensor>();
+        distanceSensorVals = new ArrayList<Double>();
         for (DistanceSensorName s : DistanceSensorName.values()) {
             try {
                 allDistanceSensors.add(hardwareMap.get(
@@ -264,10 +265,21 @@ public abstract class RobotHardware extends OpMode {
                 telemetry.addData("Distance Sensor Missing", s.name());
                 allDistanceSensors.add(null);
             }
+            distanceSensorVals.add(new Double(0));
         }
 
         raiseJewelArm();
         centerJewelArm();
+    }
+
+    public void loop() {
+        for (DistanceSensorName s : DistanceSensorName.values()) {
+            DistanceSensor sensor = allDistanceSensors.get(s.ordinal());
+            if (sensor == null) continue;
+            Double d = sensor.getDistance(DistanceUnit.CM);
+            if (d.isNaN() || d < expectMinDist || d > expectMaxDist) continue;
+            distanceSensorVals.set(s.ordinal(), d);
+        }
     }
 
     /**
@@ -292,6 +304,9 @@ public abstract class RobotHardware extends OpMode {
     private ArrayList<ColorSensor> allColorSensors;
     // All distance sensors on the robot, in order of DistanceSensorName.
     private ArrayList<DistanceSensor> allDistanceSensors;
+    // Stored values for the distance sensor.
+    // Used to lookup last value if current is bad.
+    private ArrayList<Double> distanceSensorVals;
 
     // Per robot tuning parameters.
     private String vuforiaLicenseKey;
@@ -300,4 +315,9 @@ public abstract class RobotHardware extends OpMode {
     private double centerJewelAngle;
     private double forwardJewelAngle;
     private double backwardJewelAngle;
+
+    // Min measurement a distance sensor should read.
+    private double expectMinDist = 1;  // 1cm.
+    // Max measurement a distance sensor should read.
+    private double expectMaxDist = 365;  // 12ft.
 }

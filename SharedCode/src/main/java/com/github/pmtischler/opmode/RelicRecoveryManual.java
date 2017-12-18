@@ -14,6 +14,7 @@ public class RelicRecoveryManual extends RobotHardware {
      */
     @Override
     public void loop() {
+        super.loop();
         setDriveForMecanumForSpeed(Mecanum.joystickToMotion(
                     gamepad1.left_stick_x, gamepad1.left_stick_y,
                     gamepad1.right_stick_x, gamepad1.right_stick_y));
