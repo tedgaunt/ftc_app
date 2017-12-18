@@ -73,7 +73,6 @@ public class RelicRecoveryAuto extends RobotHardware {
         StateMachine.State driveToCryptobox = newDriveToCryptobox(null);
         StateMachine.State hitJewel = newHitJewel(driveToCryptobox);
         StateMachine.State detectVuforia = new DetectVuforia(hitJewel);
-
         machine = new StateMachine(detectVuforia);
 
         telemetry.update();
@@ -81,6 +80,7 @@ public class RelicRecoveryAuto extends RobotHardware {
 
     @Override
     public void loop() {
+        super.loop();
         machine.update();
         telemetry.addData("vuMark", vuMark.name());
         telemetry.update();
@@ -309,11 +309,11 @@ public class RelicRecoveryAuto extends RobotHardware {
             }
 
             {
-                double kp = 0.5 / 20.0;
-                double ti = 1.0;
+                double kp = 0.3 / 20.0;
+                double ti = 2.0;
                 double td = 0.1;
-                double integralMax = 1.0;
-                double outputMax = 0.8;
+                double integralMax = 0.2 * (1.0 / kp);
+                double outputMax = 0.3;
                 frontPid = new Pid(kp, ti, td,
                                    -integralMax, integralMax,
                                    -outputMax, outputMax);
@@ -322,11 +322,11 @@ public class RelicRecoveryAuto extends RobotHardware {
                                   -outputMax, outputMax);
             }
             {
-                double kp = 0.5 / 20;
-                double ti = 1.0;
+                double kp = 0.1 / 20;
+                double ti = 2.0;
                 double td = 0.1;
-                double integralMax = 1.0;
-                double outputMax = 0.8;
+                double integralMax = 0.3 * (1.0 / kp);
+                double outputMax = 0.3;
                 rotatePid = new Pid(kp, ti, td,
                                     -integralMax, integralMax,
                                     -outputMax, outputMax);
@@ -359,17 +359,6 @@ public class RelicRecoveryAuto extends RobotHardware {
             telemetry.addData("Side Dist (cm)", sideCm);
             telemetry.addData("Error Dist (cm)", errorDistCm);
             telemetry.addData("Error Rotate Dist (cm)", errorRotateDistCm);
-
-            // Check for noise values off the sensor.
-            List<Double> dists = Arrays.asList(frontLeftCm, frontRightCm,
-                                               frontCm, sideCm);
-            for (Double d : dists) {
-                if (d.isNaN() || d < noiseDistMin || d > noiseDistMax) {
-                    // Need non-noise values to navigate.
-                    telemetry.addData("Invalid/Noise Dist (cm)", d);
-                    return this;
-                }
-            }
 
             // Check if the robot has stayed at goal for required time.
             if (errorDistCm > distDiffSatisfyCm ||
@@ -408,9 +397,6 @@ public class RelicRecoveryAuto extends RobotHardware {
         // Dist from target where it's considered satisfied.
         private double distDiffSatisfyCm = 5;
         private double rotateDiffSatisfyCm = 5;
-        // Dist bound read from sensor where it's considered noise.
-        private double noiseDistMin = 5;  // Too close.
-        private double noiseDistMax = 215;  // Too far.
         // Last iteration time for dt.
         private double lastTime;
         // Last time out of target range.
@@ -445,5 +431,5 @@ public class RelicRecoveryAuto extends RobotHardware {
     // TODO: Support 12 values (4 start pos, 3 goals).
     // TODO: Load this from res.
     private double cryptoFrontDistCm = 30;
-    private double cryptoSideDistCm = 100;
+    private double cryptoSideDistCm = 30;
 }
