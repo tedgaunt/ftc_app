@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 /**
  * Autonomous demo for FTC Relic Recovery game.
+ * Assumes Jewel arm and the phone's camera are mounted on right of robot,
+ * which influences expected orientations at start.
  */
 public class RelicRecoveryAuto extends RobotHardware {
 
@@ -318,12 +320,32 @@ public class RelicRecoveryAuto extends RobotHardware {
         public NavigateViaDistance(StateMachine.State next) {
             this.next = next;
 
-            targetFrontDistCm = cryptoFrontDistCm;
-            targetSideDistCm = cryptoSideDistCm;
             if (robotColor == Color.Ftc.RED) {
                 sideSensor = DistanceSensorName.RIGHT;
+                if (robotStartPos == StartPosition.FIELD_CENTER) {
+                    targetFrontDistCm = getResourceDouble(
+                            R.dimen.red_center_crypto_front_dist);
+                    targetSideDistCm = getResourceDouble(
+                            R.dimen.red_center_crypto_side_dist);
+                } else {
+                    targetFrontDistCm = getResourceDouble(
+                            R.dimen.red_corner_crypto_front_dist);
+                    targetSideDistCm = getResourceDouble(
+                            R.dimen.red_corner_crypto_side_dist);
+                }
             } else {
                 sideSensor = DistanceSensorName.LEFT;
+                if (robotStartPos == StartPosition.FIELD_CENTER) {
+                    targetFrontDistCm = getResourceDouble(
+                            R.dimen.blue_center_crypto_front_dist);
+                    targetSideDistCm = getResourceDouble(
+                            R.dimen.blue_center_crypto_side_dist);
+                } else {
+                    targetFrontDistCm = getResourceDouble(
+                            R.dimen.blue_corner_crypto_front_dist);
+                    targetSideDistCm = getResourceDouble(
+                            R.dimen.blue_corner_crypto_side_dist);
+                }
             }
 
             {
@@ -481,11 +503,4 @@ public class RelicRecoveryAuto extends RobotHardware {
     private StateMachine machine;
     // The detected Vuforia Mark.
     private RelicRecoveryVuMark vuMark;
-
-
-    // Target distance readings to navigate to cryptobox.
-    // TODO: Support 12 values (4 start pos, 3 goals).
-    // TODO: Load this from res.
-    private double cryptoFrontDistCm = 30;
-    private double cryptoSideDistCm = 30;
 }
