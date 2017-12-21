@@ -64,6 +64,9 @@ public class RelicRecoveryAuto extends RobotHardware {
         super.init();
         vuMark = RelicRecoveryVuMark.UNKNOWN;
 
+        driveMaxPower = hardwareMap.appContext.getResources().getInteger(
+                R.integer.drive_max_power_percent) / 100.0;
+
         telemetry.addData("Robot Color", robotColor.name());
         telemetry.addData("Robot Start Position", robotStartPos.name());
 
@@ -276,7 +279,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                         R.integer.red_corner_turn_toward_ms) / 1000.0;
                 // Red corner turns right.
                 turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, -0.5),
+                        new Mecanum.Motion(0, 0, -driveMaxPower),
                         turnTowardSec, driveToColumn);
             }
         } else {
@@ -289,7 +292,7 @@ public class RelicRecoveryAuto extends RobotHardware {
                         R.integer.blue_center_turn_toward_ms) / 1000.0;
                 // Blue center turns around.
                 turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, 0.5),
+                        new Mecanum.Motion(0, 0, driveMaxPower),
                         turnTowardSec, driveToColumn);
             } else {
                 driveOffSec  = res.getInteger(
@@ -298,12 +301,12 @@ public class RelicRecoveryAuto extends RobotHardware {
                         R.integer.blue_corner_turn_toward_ms) / 1000.0;
                 // Blue corner turns right.
                 turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, -0.5),
+                        new Mecanum.Motion(0, 0, -driveMaxPower),
                         turnTowardSec, driveToColumn);
             }
         }
         StateMachine.State driveOff = new DriveForTime(
-                new Mecanum.Motion(0.5, driveOffAngle, 0),
+                new Mecanum.Motion(driveMaxPower, driveOffAngle, 0),
                 driveOffSec, turnToFace);
         return driveOff;
     }
@@ -327,23 +330,21 @@ public class RelicRecoveryAuto extends RobotHardware {
                 double ti = 2.0;
                 double td = 0.1;
                 double integralMax = 0.2 * (1.0 / kp);
-                double outputMax = 0.3;
                 frontPid = new Pid(kp, ti, td,
                                    -integralMax, integralMax,
-                                   -outputMax, outputMax);
+                                   -driveMaxPower, driveMaxPower);
                 sidePid = new Pid(kp, ti, td,
                                   -integralMax, integralMax,
-                                  -outputMax, outputMax);
+                                  -driveMaxPower, driveMaxPower);
             }
             {
                 double kp = 0.1 / 20;
                 double ti = 2.0;
                 double td = 0.1;
                 double integralMax = 0.3 * (1.0 / kp);
-                double outputMax = 0.3;
                 rotatePid = new Pid(kp, ti, td,
                                     -integralMax, integralMax,
-                                    -outputMax, outputMax);
+                                    -driveMaxPower, driveMaxPower);
             }
         }
 
@@ -473,6 +474,9 @@ public class RelicRecoveryAuto extends RobotHardware {
     protected StartPosition robotStartPos;
     // The detected Vuforia Mark.
     private RelicRecoveryVuMark vuMark;
+
+    // Max output power on driving motors.
+    private double driveMaxPower;
 
     // Target distance readings to navigate to cryptobox.
     // TODO: Support 12 values (4 start pos, 3 goals).
