@@ -10,6 +10,7 @@ import com.github.pmtischler.control.Pid;
 import com.github.pmtischler.vision.SimpleVuforia;
 
 import android.content.res.Resources;
+import android.util.TypedValue;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,6 +87,12 @@ public class RelicRecoveryAuto extends RobotHardware {
         machine.update();
         telemetry.addData("vuMark", vuMark.name());
         telemetry.update();
+    }
+
+    double getResourceDouble(int id) {
+        TypedValue outValue = new TypedValue();
+        hardwareMap.appContext.getResources().getValue(id, outValue, true);
+        return outValue.getFloat();
     }
 
     // State in the machine to wait for a duration.
@@ -326,10 +333,11 @@ public class RelicRecoveryAuto extends RobotHardware {
             }
 
             {
-                double kp = 0.3 / 20.0;
-                double ti = 2.0;
-                double td = 0.1;
-                double integralMax = 0.2 * (1.0 / kp);
+                double kp = getResourceDouble(R.dimen.nav_translate_pid_kp);
+                double ti = getResourceDouble(R.dimen.nav_translate_pid_ti);
+                double td = getResourceDouble(R.dimen.nav_translate_pid_td);
+                double integralMax = getResourceDouble(
+                        R.dimen.nav_translate_pid_integral_max);
                 frontPid = new Pid(kp, ti, td,
                                    -integralMax, integralMax,
                                    -driveMaxPower, driveMaxPower);
@@ -338,10 +346,11 @@ public class RelicRecoveryAuto extends RobotHardware {
                                   -driveMaxPower, driveMaxPower);
             }
             {
-                double kp = 0.1 / 20;
-                double ti = 2.0;
-                double td = 0.1;
-                double integralMax = 0.3 * (1.0 / kp);
+                double kp = getResourceDouble(R.dimen.nav_rotate_pid_kp);
+                double ti = getResourceDouble(R.dimen.nav_rotate_pid_ti);
+                double td = getResourceDouble(R.dimen.nav_rotate_pid_td);
+                double integralMax = getResourceDouble(
+                        R.dimen.nav_rotate_pid_integral_max);
                 rotatePid = new Pid(kp, ti, td,
                                     -integralMax, integralMax,
                                     -driveMaxPower, driveMaxPower);
@@ -410,8 +419,8 @@ public class RelicRecoveryAuto extends RobotHardware {
         private StateMachine.State next;
 
         // Dist from target where it's considered satisfied.
-        private double distDiffSatisfyCm = 5;
-        private double rotateDiffSatisfyCm = 5;
+        private double distDiffSatisfyCm = 3;
+        private double rotateDiffSatisfyCm = 3;
         // Last iteration time for dt.
         private double lastTime;
         // Last time out of target range.

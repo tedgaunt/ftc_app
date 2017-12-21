@@ -9,4 +9,13 @@
     <integer name="blue_center_turn_toward_ms">500</integer>
     <integer name="blue_corner_drive_off_ms">1000</integer>
     <integer name="blue_corner_turn_toward_ms">500</integer>
+
+     <item name="nav_translate_pid_kp" format="float" type="dimen">0.015</item>
+     <item name="nav_translate_pid_ti" format="float" type="dimen">2.0</item>
+     <item name="nav_translate_pid_td" format="float" type="dimen">0.1</item>
+     <item name="nav_translate_pid_integral_max" format="float" type="dimen">13.0</item>
+     <item name="nav_rotate_pid_kp" format="float" type="dimen">0.005</item>
+     <item name="nav_rotate_pid_ti" format="float" type="dimen">2.0</item>
+     <item name="nav_rotate_pid_td" format="float" type="dimen">0.1</item>
+     <item name="nav_rotate_pid_integral_max" format="float" type="dimen">60.0</item>
 </resources>
