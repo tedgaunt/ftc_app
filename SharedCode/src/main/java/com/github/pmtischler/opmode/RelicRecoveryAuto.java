@@ -9,6 +9,7 @@ import com.github.pmtischler.control.Mecanum;
 import com.github.pmtischler.control.Pid;
 import com.github.pmtischler.vision.SimpleVuforia;
 
+import android.content.res.Resources;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class RelicRecoveryAuto extends RobotHardware {
 
     @Autonomous(name="pmt.Red.Center", group="pmtischler")
-    public static class RelicRecoveryAutoRedCenter extends RelicRecoveryAuto {
+    public static class RedCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.RED;
             robotStartPos = StartPosition.FIELD_CENTER;
@@ -32,7 +33,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Red.Corner", group="pmtischler")
-    public static class RelicRecoveryAutoRedCorner extends RelicRecoveryAuto {
+    public static class RedCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.RED;
             robotStartPos = StartPosition.FIELD_CORNER;
@@ -41,7 +42,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Blue.Center", group="pmtischler")
-    public static class RelicRecoveryAutoBlueCenter extends RelicRecoveryAuto {
+    public static class BlueCenter extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.BLUE;
             robotStartPos = StartPosition.FIELD_CENTER;
@@ -50,7 +51,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     @Autonomous(name="pmt.Blue.Corner", group="pmtischler")
-    public static class RelicRecoveryAutoBlueCorner extends RelicRecoveryAuto {
+    public static class BlueCorner extends RelicRecoveryAuto {
         @Override public void init() {
             robotColor = Color.Ftc.BLUE;
             robotStartPos = StartPosition.FIELD_CORNER;
@@ -61,12 +62,6 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Override
     public void init() {
         super.init();
-
-        driveOffSec = hardwareMap.appContext.getResources().getInteger(
-                R.integer.drive_off_ms) / 1000.0;
-        turnTowardSec = hardwareMap.appContext.getResources().getInteger(
-                R.integer.turn_toward_ms) / 1000.0;
-
         vuMark = RelicRecoveryVuMark.UNKNOWN;
 
         telemetry.addData("Robot Color", robotColor.name());
@@ -260,37 +255,52 @@ public class RelicRecoveryAuto extends RobotHardware {
     private StateMachine.State newDriveToCryptobox(StateMachine.State next) {
         StateMachine.State driveToColumn = new NavigateViaDistance(next);
 
+        Resources res = hardwareMap.appContext.getResources();
+        double driveOffSec;
+        double driveOffAngle;
+        double turnTowardSec;
+
         StateMachine.State turnToFace;
         if (robotColor == Color.Ftc.RED) {
+            // Red drives forward off platform.
+            driveOffAngle = 0;
             if (robotStartPos == StartPosition.FIELD_CENTER) {
+                driveOffSec  = res.getInteger(
+                        R.integer.red_center_drive_off_ms) / 1000.0;
                 // Red center does not turn.
-                turnToFace = next;
+                turnToFace = driveToColumn;
             } else {
+                driveOffSec  = res.getInteger(
+                        R.integer.red_corner_drive_off_ms) / 1000.0;
+                turnTowardSec = res.getInteger(
+                        R.integer.red_corner_turn_toward_ms) / 1000.0;
                 // Red corner turns right.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, -0.5),
                         turnTowardSec, driveToColumn);
             }
         } else {
+            // Blue drives backwards off platform.
+            driveOffAngle = Math.PI;
             if (robotStartPos == StartPosition.FIELD_CENTER) {
+                driveOffSec  = res.getInteger(
+                        R.integer.blue_center_drive_off_ms) / 1000.0;
+                turnTowardSec = res.getInteger(
+                        R.integer.blue_center_turn_toward_ms) / 1000.0;
                 // Blue center turns around.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, 0.5),
-                        turnTowardSec * 2, driveToColumn);
+                        turnTowardSec, driveToColumn);
             } else {
+                driveOffSec  = res.getInteger(
+                        R.integer.blue_corner_drive_off_ms) / 1000.0;
+                turnTowardSec = res.getInteger(
+                        R.integer.blue_corner_turn_toward_ms) / 1000.0;
                 // Blue corner turns right.
                 turnToFace = new DriveForTime(
                         new Mecanum.Motion(0, 0, -0.5),
                         turnTowardSec, driveToColumn);
             }
-        }
-
-        // Red drives off plaform forward, blue backwards.
-        double driveOffAngle;
-        if (robotColor == Color.Ftc.RED) {
-            driveOffAngle = 0;
-        } else {
-            driveOffAngle = Math.PI;
         }
         StateMachine.State driveOff = new DriveForTime(
                 new Mecanum.Motion(0.5, driveOffAngle, 0),
@@ -464,10 +474,6 @@ public class RelicRecoveryAuto extends RobotHardware {
     // The detected Vuforia Mark.
     private RelicRecoveryVuMark vuMark;
 
-    // Per robot tuning parameters.
-    // Seconds to drive off platform and turn.
-    private double driveOffSec;
-    private double turnTowardSec;
     // Target distance readings to navigate to cryptobox.
     // TODO: Support 12 values (4 start pos, 3 goals).
     // TODO: Load this from res.
