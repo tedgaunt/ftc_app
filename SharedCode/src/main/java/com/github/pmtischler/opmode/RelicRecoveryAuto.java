@@ -65,7 +65,7 @@ public class RelicRecoveryAuto extends RobotHardware {
         super.init();
         vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-        driveMaxPower = hardwareMap.appContext.getResources().getInteger(
+        driveMaxPower = getResourceInt(
                 R.integer.drive_max_power_percent) / 100.0;
 
         telemetry.addData("Robot Color", robotColor.name());
@@ -89,6 +89,12 @@ public class RelicRecoveryAuto extends RobotHardware {
         telemetry.update();
     }
 
+    // Get constant from resource file.
+    int getResourceInt(int id) {
+        return hardwareMap.appContext.getResources().getInteger(id);
+    }
+
+    // Get constant from resource file.
     double getResourceDouble(int id) {
         TypedValue outValue = new TypedValue();
         hardwareMap.appContext.getResources().getValue(id, outValue, true);
@@ -263,55 +269,43 @@ public class RelicRecoveryAuto extends RobotHardware {
     }
 
     private StateMachine.State newDriveToCryptobox(StateMachine.State next) {
-        StateMachine.State driveToColumn = new NavigateViaDistance(next);
-
-        Resources res = hardwareMap.appContext.getResources();
         double driveOffSec;
         double driveOffAngle;
         double turnTowardSec;
-
-        StateMachine.State turnToFace;
         if (robotColor == Color.Ftc.RED) {
             // Red drives forward off platform.
             driveOffAngle = 0;
             if (robotStartPos == StartPosition.FIELD_CENTER) {
-                driveOffSec  = res.getInteger(
+                driveOffSec  = getResourceInt(
                         R.integer.red_center_drive_off_ms) / 1000.0;
-                // Red center does not turn.
-                turnToFace = driveToColumn;
+                turnTowardSec = getResourceInt(
+                        R.integer.red_center_turn_toward_ms) / 1000.0;
             } else {
-                driveOffSec  = res.getInteger(
+                driveOffSec  = getResourceInt(
                         R.integer.red_corner_drive_off_ms) / 1000.0;
-                turnTowardSec = res.getInteger(
+                turnTowardSec = getResourceInt(
                         R.integer.red_corner_turn_toward_ms) / 1000.0;
-                // Red corner turns right.
-                turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, -driveMaxPower),
-                        turnTowardSec, driveToColumn);
             }
         } else {
             // Blue drives backwards off platform.
             driveOffAngle = Math.PI;
             if (robotStartPos == StartPosition.FIELD_CENTER) {
-                driveOffSec  = res.getInteger(
+                driveOffSec  = getResourceInt(
                         R.integer.blue_center_drive_off_ms) / 1000.0;
-                turnTowardSec = res.getInteger(
+                turnTowardSec = getResourceInt(
                         R.integer.blue_center_turn_toward_ms) / 1000.0;
-                // Blue center turns around.
-                turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, driveMaxPower),
-                        turnTowardSec, driveToColumn);
             } else {
-                driveOffSec  = res.getInteger(
+                driveOffSec  = getResourceInt(
                         R.integer.blue_corner_drive_off_ms) / 1000.0;
-                turnTowardSec = res.getInteger(
+                turnTowardSec = getResourceInt(
                         R.integer.blue_corner_turn_toward_ms) / 1000.0;
-                // Blue corner turns right.
-                turnToFace = new DriveForTime(
-                        new Mecanum.Motion(0, 0, -driveMaxPower),
-                        turnTowardSec, driveToColumn);
             }
         }
+
+        StateMachine.State driveToColumn = new NavigateViaDistance(next);
+        StateMachine.State turnToFace = new DriveForTime(
+                new Mecanum.Motion(0, 0, driveMaxPower),
+                turnTowardSec, driveToColumn);
         StateMachine.State driveOff = new DriveForTime(
                 new Mecanum.Motion(driveMaxPower, driveOffAngle, 0),
                 driveOffSec, turnToFace);
@@ -475,17 +469,19 @@ public class RelicRecoveryAuto extends RobotHardware {
         private BlackBox.Player player;
     }
 
-    // The state machine.
-    private StateMachine machine;
     // The robot's color.
     protected Color.Ftc robotColor;
     // The robot's starting position.
     protected StartPosition robotStartPos;
-    // The detected Vuforia Mark.
-    private RelicRecoveryVuMark vuMark;
 
     // Max output power on driving motors.
     private double driveMaxPower;
+
+    // The state machine.
+    private StateMachine machine;
+    // The detected Vuforia Mark.
+    private RelicRecoveryVuMark vuMark;
+
 
     // Target distance readings to navigate to cryptobox.
     // TODO: Support 12 values (4 start pos, 3 goals).
