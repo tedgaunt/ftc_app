@@ -1,23 +1,13 @@
 package com.github.pmtischler.opmode;
 
-import com.github.pmtischler.R;
 import com.github.pmtischler.base.BlackBox;
 import com.github.pmtischler.base.Color;
 import com.github.pmtischler.base.StateMachine;
 import com.github.pmtischler.base.StateMachine.State;
-import com.github.pmtischler.control.Mecanum;
-import com.github.pmtischler.control.Pid;
-import com.github.pmtischler.vision.SimpleVuforia;
 
-import android.content.res.Resources;
-import android.util.TypedValue;
 import java.io.FileInputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 /**
  * Autonomous demo for FTC Relic Recovery game.
@@ -65,20 +55,14 @@ public class RelicRecoveryAuto extends RobotHardware {
     @Override
     public void init() {
         super.init();
-        vuMark = RelicRecoveryVuMark.UNKNOWN;
-
-        driveMaxPower = getResourceInt(
-                R.integer.drive_max_power_percent) / 100.0;
 
         telemetry.addData("Robot Color", robotColor.name());
         telemetry.addData("Robot Start Position", robotStartPos.name());
 
-        StateMachine.State scoreGlyph = new BlackboxPlayback(
+        StateMachine.State playback = new BlackboxPlayback(
                 getStartPositionName(robotColor, robotStartPos), null);
-        StateMachine.State driveToCryptobox = newDriveToCryptobox(scoreGlyph);
-        StateMachine.State hitJewel = newHitJewel(driveToCryptobox);
-        StateMachine.State detectVuforia = new DetectVuforia(hitJewel);
-        machine = new StateMachine(detectVuforia);
+        StateMachine.State hitJewel = newHitJewel(playback);
+        machine = new StateMachine(hitJewel);
 
         telemetry.update();
     }
@@ -87,20 +71,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     public void loop() {
         super.loop();
         machine.update();
-        telemetry.addData("vuMark", vuMark.name());
         telemetry.update();
-    }
-
-    // Get constant from resource file.
-    int getResourceInt(int id) {
-        return hardwareMap.appContext.getResources().getInteger(id);
-    }
-
-    // Get constant from resource file.
-    double getResourceDouble(int id) {
-        TypedValue outValue = new TypedValue();
-        hardwareMap.appContext.getResources().getValue(id, outValue, true);
-        return outValue.getFloat();
     }
 
     // State in the machine to wait for a duration.
@@ -127,41 +98,6 @@ public class RelicRecoveryAuto extends RobotHardware {
         private StateMachine.State next;
         private double startTime;
     }
-
-    // Detects the Vuforia Mark.
-    private class DetectVuforia implements StateMachine.State {
-        public DetectVuforia(StateMachine.State next) {
-            this.next = next;
-            vuforia = new SimpleVuforia(getVuforiaLicenseKey());
-        }
-
-        @Override
-        public void start() {
-            startTime = time;
-        }
-
-        @Override
-        public State update() {
-            vuMark = vuforia.detectMark();
-            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-                // Found the mark.
-                return next;
-            }
-
-            if (time - startTime > 5) {
-                // Did not detect mark within time bound.
-                vuMark = RelicRecoveryVuMark.UNKNOWN;
-                return next;
-            }
-
-            return this;
-        }
-
-        private StateMachine.State next;
-        private SimpleVuforia vuforia;
-        private double startTime;
-    }
-
 
     // Drops the jewel arm.
     private class DropJewelArm implements StateMachine.State {
@@ -239,220 +175,6 @@ public class RelicRecoveryAuto extends RobotHardware {
         return jewelDrop;
     }
 
-    // Drives a specific motion for a specific amount of time.
-    private class DriveForTime implements StateMachine.State {
-        public DriveForTime(Mecanum.Motion motion, double duration,
-                            StateMachine.State next) {
-            this.motion = motion;
-            this.duration = duration;
-            this.next = next;
-        }
-
-        @Override
-        public void start() {
-            startTime = time;
-        }
-
-        @Override
-        public State update() {
-            if (time - startTime < duration) {
-                setDriveForMecanum(motion);
-                return this;
-            } else {
-                setDriveForMecanum(new Mecanum.Motion(0, 0, 0));
-                return next;
-            }
-        }
-
-        private double startTime;
-        private Mecanum.Motion motion;
-        private double duration;
-        private StateMachine.State next;
-    }
-
-    private StateMachine.State newDriveToCryptobox(StateMachine.State next) {
-        double driveOffSec;
-        double driveOffAngle;
-        double turnTowardSec;
-        if (robotColor == Color.Ftc.RED) {
-            // Red drives forward off platform.
-            driveOffAngle = 0;
-            if (robotStartPos == StartPosition.FIELD_CENTER) {
-                driveOffSec  = getResourceInt(
-                        R.integer.red_center_drive_off_ms) / 1000.0;
-                turnTowardSec = getResourceInt(
-                        R.integer.red_center_turn_toward_ms) / 1000.0;
-            } else {
-                driveOffSec  = getResourceInt(
-                        R.integer.red_corner_drive_off_ms) / 1000.0;
-                turnTowardSec = getResourceInt(
-                        R.integer.red_corner_turn_toward_ms) / 1000.0;
-            }
-        } else {
-            // Blue drives backwards off platform.
-            driveOffAngle = Math.PI;
-            if (robotStartPos == StartPosition.FIELD_CENTER) {
-                driveOffSec  = getResourceInt(
-                        R.integer.blue_center_drive_off_ms) / 1000.0;
-                turnTowardSec = getResourceInt(
-                        R.integer.blue_center_turn_toward_ms) / 1000.0;
-            } else {
-                driveOffSec  = getResourceInt(
-                        R.integer.blue_corner_drive_off_ms) / 1000.0;
-                turnTowardSec = getResourceInt(
-                        R.integer.blue_corner_turn_toward_ms) / 1000.0;
-            }
-        }
-
-        StateMachine.State driveToColumn = new NavigateViaDistance(next);
-        StateMachine.State turnToFace = new DriveForTime(
-                new Mecanum.Motion(0, 0, driveMaxPower),
-                turnTowardSec, driveToColumn);
-        StateMachine.State driveOff = new DriveForTime(
-                new Mecanum.Motion(driveMaxPower, driveOffAngle, 0),
-                driveOffSec, turnToFace);
-        return driveOff;
-    }
-
-    // Drives towards a position on the map using distance sensor readings.
-    // Assumes the robot is in the correct orientation and square with the field.
-    private class NavigateViaDistance implements StateMachine.State {
-        public NavigateViaDistance(StateMachine.State next) {
-            this.next = next;
-
-            if (robotColor == Color.Ftc.RED) {
-                sideSensor = DistanceSensorName.RIGHT;
-                if (robotStartPos == StartPosition.FIELD_CENTER) {
-                    targetFrontDistCm = getResourceDouble(
-                            R.dimen.red_center_crypto_front_dist);
-                    targetSideDistCm = getResourceDouble(
-                            R.dimen.red_center_crypto_side_dist);
-                } else {
-                    targetFrontDistCm = getResourceDouble(
-                            R.dimen.red_corner_crypto_front_dist);
-                    targetSideDistCm = getResourceDouble(
-                            R.dimen.red_corner_crypto_side_dist);
-                }
-            } else {
-                sideSensor = DistanceSensorName.LEFT;
-                if (robotStartPos == StartPosition.FIELD_CENTER) {
-                    targetFrontDistCm = getResourceDouble(
-                            R.dimen.blue_center_crypto_front_dist);
-                    targetSideDistCm = getResourceDouble(
-                            R.dimen.blue_center_crypto_side_dist);
-                } else {
-                    targetFrontDistCm = getResourceDouble(
-                            R.dimen.blue_corner_crypto_front_dist);
-                    targetSideDistCm = getResourceDouble(
-                            R.dimen.blue_corner_crypto_side_dist);
-                }
-            }
-
-            {
-                double kp = getResourceDouble(R.dimen.nav_translate_pid_kp);
-                double ti = getResourceDouble(R.dimen.nav_translate_pid_ti);
-                double td = getResourceDouble(R.dimen.nav_translate_pid_td);
-                double integralMax = getResourceDouble(
-                        R.dimen.nav_translate_pid_integral_max);
-                frontPid = new Pid(kp, ti, td,
-                                   -integralMax, integralMax,
-                                   -driveMaxPower, driveMaxPower);
-                sidePid = new Pid(kp, ti, td,
-                                  -integralMax, integralMax,
-                                  -driveMaxPower, driveMaxPower);
-            }
-            {
-                double kp = getResourceDouble(R.dimen.nav_rotate_pid_kp);
-                double ti = getResourceDouble(R.dimen.nav_rotate_pid_ti);
-                double td = getResourceDouble(R.dimen.nav_rotate_pid_td);
-                double integralMax = getResourceDouble(
-                        R.dimen.nav_rotate_pid_integral_max);
-                rotatePid = new Pid(kp, ti, td,
-                                    -integralMax, integralMax,
-                                    -driveMaxPower, driveMaxPower);
-            }
-        }
-
-        @Override
-        public void start() {
-            lastTime = time;
-            lastTimeOutsideRange = time;
-        }
-
-        @Override
-        public State update() {
-            double dt = time - lastTime;
-            double frontLeftCm = getDistanceSensorCm(
-                    DistanceSensorName.FRONT_LEFT);
-            double frontRightCm = getDistanceSensorCm(
-                    DistanceSensorName.FRONT_RIGHT);
-            double frontCm = (frontLeftCm + frontRightCm) / 2.0;
-            double sideCm = getDistanceSensorCm(sideSensor);
-            double errorDistCm = Math.sqrt(
-                    Math.pow(frontCm - targetFrontDistCm, 2) +
-                    Math.pow(sideCm - targetSideDistCm, 2));
-            double errorRotateDistCm = Math.abs(frontLeftCm - frontRightCm);
-
-            telemetry.addData("Front Left Dist (cm)", frontLeftCm);
-            telemetry.addData("Front Right Dist (cm)", frontRightCm);
-            telemetry.addData("Front Avg Dist (cm)", frontCm);
-            telemetry.addData("Side Dist (cm)", sideCm);
-            telemetry.addData("Error Dist (cm)", errorDistCm);
-            telemetry.addData("Error Rotate Dist (cm)", errorRotateDistCm);
-
-            // Check if the robot has stayed at goal for required time.
-            if (errorDistCm > distDiffSatisfyCm ||
-                    errorRotateDistCm > rotateDiffSatisfyCm) {
-                lastTimeOutsideRange = time;
-            }
-            if (time - lastTimeOutsideRange >= 2.0) {
-                // Settled in target position, done navigating.
-                setDriveForMecanum(new Mecanum.Motion(0, 0, 0));
-                return next;
-            }
-
-            // Determine translate motor powers.
-            double frontPower = -frontPid.update(targetFrontDistCm, frontCm, dt);
-            double sidePower = -sidePid.update(targetSideDistCm, sideCm, dt);
-            if (sideSensor == DistanceSensorName.RIGHT) {
-                // Right sensor faces -Y.
-                sidePower = sidePower * -1;
-            }
-            double translatePower = Math.sqrt(
-                    Math.pow(frontPower, 2) + Math.pow(sidePower, 2));
-            double powerAngle = Math.atan2(sidePower, frontPower);
-
-            // Determine rotation motor powers.
-            double rotatePower = -rotatePid.update(frontLeftCm, frontRightCm, dt);
-
-            setDriveForMecanum(new Mecanum.Motion(
-                        translatePower, powerAngle, rotatePower));
-
-            lastTime = time;
-            return this;
-        }
-
-        private StateMachine.State next;
-
-        // Dist from target where it's considered satisfied.
-        private double distDiffSatisfyCm = 3;
-        private double rotateDiffSatisfyCm = 3;
-        // Last iteration time for dt.
-        private double lastTime;
-        // Last time out of target range.
-        private double lastTimeOutsideRange;
-        // Target distance readings.
-        private double targetFrontDistCm;
-        private double targetSideDistCm;
-        // Side sensor name.
-        private DistanceSensorName sideSensor;
-
-        // Control loops for navigating.
-        private Pid frontPid;
-        private Pid sidePid;
-        private Pid rotatePid;
-    }
-
     // Plays back a recorded blackbox stream.
     private class BlackboxPlayback implements StateMachine.State {
         public BlackboxPlayback(String filename, StateMachine.State next) {
@@ -496,11 +218,6 @@ public class RelicRecoveryAuto extends RobotHardware {
     // The robot's starting position.
     protected StartPosition robotStartPos;
 
-    // Max output power on driving motors.
-    private double driveMaxPower;
-
     // The state machine.
     private StateMachine machine;
-    // The detected Vuforia Mark.
-    private RelicRecoveryVuMark vuMark;
 }

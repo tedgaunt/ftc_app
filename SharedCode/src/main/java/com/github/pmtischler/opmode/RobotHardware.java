@@ -6,16 +6,12 @@ import com.github.pmtischler.control.Mecanum;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.content.res.Resources;
+import android.util.TypedValue;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * Hardware Abstraction Layer for Robot.
@@ -24,6 +20,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Per-robot customization configured in SharedCode/src/main/res/values/.
  */
 public abstract class RobotHardware extends OpMode {
+    // Get constant from resource file.
+    int getResourceInt(int id) {
+        return hardwareMap.appContext.getResources().getInteger(id);
+    }
+
+    // Get constant from resource file.
+    double getResourceDouble(int id) {
+        TypedValue outValue = new TypedValue();
+        hardwareMap.appContext.getResources().getValue(id, outValue, true);
+        return outValue.getFloat();
+    }
+
     // The motors on the robot.
     protected enum MotorName {
         DRIVE_FRONT_LEFT,
@@ -171,28 +179,6 @@ public abstract class RobotHardware extends OpMode {
         }
     }
 
-    // The distance sensors on the robot.
-    protected enum DistanceSensorName {
-        LEFT,
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        RIGHT,
-    }
-
-    /**
-     * Gets the distance value on the sensor in centimeters.
-     * Returns -1 when the sensor is unavailable.
-     * @param sensor The sensor to read.
-     */
-    protected double getDistanceSensorCm(DistanceSensorName sensor) {
-        DistanceSensor s = allDistanceSensors.get(sensor.ordinal());
-        if (s == null) {
-            telemetry.addData("Distance Sensor Missing", sensor.name());
-            return -1;
-        }
-        return distanceSensorVals.get(sensor.ordinal());
-    }
-
     // Possible starting positions.
     protected enum StartPosition {
         FIELD_CENTER,
@@ -205,27 +191,18 @@ public abstract class RobotHardware extends OpMode {
     }
 
     /**
-     * Gets the Vuforia license key.
-     */
-    protected String getVuforiaLicenseKey() {
-        return vuforiaLicenseKey;
-    }
-
-    /**
      * Initialize the hardware handles.
      */
     public void init() {
-        vuforiaLicenseKey = hardwareMap.appContext.getResources().getString(
-                R.string.vuforia_key);
-        raisedJewelAngle = hardwareMap.appContext.getResources().getInteger(
+        raisedJewelAngle = getResourceInt(
                 R.integer.raised_jewel_angle_percent) / 100.0;
-        loweredJewelAngle = hardwareMap.appContext.getResources().getInteger(
+        loweredJewelAngle = getResourceInt(
                 R.integer.lowered_jewel_angle_percent) / 100.0;
-        centerJewelAngle = hardwareMap.appContext.getResources().getInteger(
+        centerJewelAngle = getResourceInt(
                 R.integer.center_jewel_angle_percent) / 100.0;
-        forwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
+        forwardJewelAngle = getResourceInt(
                 R.integer.forward_jewel_angle_percent) / 100.0;
-        backwardJewelAngle = hardwareMap.appContext.getResources().getInteger(
+        backwardJewelAngle = getResourceInt(
                 R.integer.backward_jewel_angle_percent) / 100.0;
 
         allMotors = new ArrayList<DcMotor>();
@@ -259,33 +236,11 @@ public abstract class RobotHardware extends OpMode {
             }
         }
 
-        allDistanceSensors = new ArrayList<DistanceSensor>();
-        distanceSensorVals = new ArrayList<Double>();
-        for (DistanceSensorName s : DistanceSensorName.values()) {
-            try {
-                allDistanceSensors.add(hardwareMap.get(
-                            ModernRoboticsI2cRangeSensor.class,
-                            s.name()));
-            } catch (Exception e) {
-                telemetry.addData("Distance Sensor Missing", s.name());
-                allDistanceSensors.add(null);
-            }
-            distanceSensorVals.add(new Double(0));
-        }
-
         raiseJewelArm();
         centerJewelArm();
     }
 
-    public void loop() {
-        for (DistanceSensorName s : DistanceSensorName.values()) {
-            DistanceSensor sensor = allDistanceSensors.get(s.ordinal());
-            if (sensor == null) continue;
-            Double d = sensor.getDistance(DistanceUnit.CM);
-            if (d.isNaN() || d < expectMinDist || d > expectMaxDist) continue;
-            distanceSensorVals.set(s.ordinal(), d);
-        }
-    }
+    public void loop() {}
 
     /**
      * End of match, stop all actuators.
@@ -307,22 +262,11 @@ public abstract class RobotHardware extends OpMode {
     private ArrayList<Servo> allServos;
     // All color sensors on the robot, in order of ColorSensorName.
     private ArrayList<ColorSensor> allColorSensors;
-    // All distance sensors on the robot, in order of DistanceSensorName.
-    private ArrayList<DistanceSensor> allDistanceSensors;
-    // Stored values for the distance sensor.
-    // Used to lookup last value if current is bad.
-    private ArrayList<Double> distanceSensorVals;
 
     // Per robot tuning parameters.
-    private String vuforiaLicenseKey;
     private double raisedJewelAngle;
     private double loweredJewelAngle;
     private double centerJewelAngle;
     private double forwardJewelAngle;
     private double backwardJewelAngle;
-
-    // Min measurement a distance sensor should read.
-    private double expectMinDist = 1;  // 1cm.
-    // Max measurement a distance sensor should read.
-    private double expectMaxDist = 365;  // 12ft.
 }
