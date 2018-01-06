@@ -189,12 +189,14 @@ public class RelicRecoveryAuto extends RobotHardware {
         }
 
         @Override
-        public void start() {}
+        public void start() {
+            startTime = time;
+        }
 
         @Override
         public State update() {
             try {
-                if (player.playback(time)) {
+                if (player.playback(time - startTime)) {
                     return this;
                 } else {
                     return next;
@@ -211,6 +213,8 @@ public class RelicRecoveryAuto extends RobotHardware {
         private FileInputStream inputStream;
         // The hardware player.
         private BlackBox.Player player;
+        // The start time of playback.
+        private double startTime;
     }
 
     // The robot's color.
