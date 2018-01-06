@@ -88,7 +88,10 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         @Override
         public State update() {
-            if (time - startTime > duration) {
+            double elapsed = time - startTime;
+            telemetry.addData("Elapsed", elapsed);
+            telemetry.addData("Duration", duration);
+            if (elapsed > duration) {
                 return next;
             }
             return this;
@@ -179,6 +182,7 @@ public class RelicRecoveryAuto extends RobotHardware {
     private class BlackboxPlayback implements StateMachine.State {
         public BlackboxPlayback(String filename, StateMachine.State next) {
             try {
+                this.filename = filename;
                 inputStream = hardwareMap.appContext.openFileInput(filename);
                 player = new BlackBox.Player(inputStream, hardwareMap);
             } catch (Exception e) {
@@ -195,8 +199,11 @@ public class RelicRecoveryAuto extends RobotHardware {
 
         @Override
         public State update() {
+            telemetry.addData("Playing File", filename);
+            double elapsed = time - startTime;
+            telemetry.addData("Elapsed", elapsed);
             try {
-                if (player.playback(time - startTime)) {
+                if (player.playback(elapsed)) {
                     return this;
                 } else {
                     return next;
@@ -208,6 +215,9 @@ public class RelicRecoveryAuto extends RobotHardware {
             }
         }
 
+        // The filename to playback.
+        private String filename;
+        // The next state after playback.
         private StateMachine.State next;
         // The input file stream.
         private FileInputStream inputStream;

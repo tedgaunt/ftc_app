@@ -77,6 +77,7 @@ public class RecordedTeleop extends RelicRecoveryManual {
      */
     public void loop() {
         super.loop();
+        telemetry.addData("Recording File", filename);
 
         try {
             for (MotorName m : MotorName.values()) {
