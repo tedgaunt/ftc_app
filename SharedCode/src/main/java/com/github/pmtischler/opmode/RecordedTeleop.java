@@ -62,6 +62,7 @@ public class RecordedTeleop extends RelicRecoveryManual {
      */
     public void init() {
         super.init();
+        startTime = -1;
         try {
             outputStream = hardwareMap.appContext.openFileOutput(
                     filename, Context.MODE_PRIVATE);
@@ -77,15 +78,19 @@ public class RecordedTeleop extends RelicRecoveryManual {
      */
     public void loop() {
         super.loop();
+        if (startTime == -1) {
+            startTime = time;
+        }
+        double elapsed = time - startTime;
         telemetry.addData("Recording File", filename);
-        telemetry.addData("Elapsed", time);
+        telemetry.addData("Elapsed", elapsed);
 
         try {
             for (MotorName m : MotorName.values()) {
-                recorder.record(m.name(), time);
+                recorder.record(m.name(), elapsed);
             }
             for (ServoName s : ServoName.values()) {
-                recorder.record(s.name(), time);
+                recorder.record(s.name(), elapsed);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,4 +118,6 @@ public class RecordedTeleop extends RelicRecoveryManual {
     private FileOutputStream outputStream;
     // The hardware recorder.
     private BlackBox.Recorder recorder;
+    // Start time of recording.
+    private double startTime;
 }
