@@ -83,7 +83,7 @@ public class BlackBox {
                     }
                 }
             }
-            return reader.readDone();
+            return !reader.readDone();
         }
 
         // The hardware to manipulate.
