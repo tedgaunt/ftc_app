@@ -1,11 +1,11 @@
 dependencies {
-    compile project(':FtcRobotController')
-    compile project(':opencv')
-    compile (name: 'RobotCore-release', ext: 'aar')
-    compile (name: 'Hardware-release', ext: 'aar')
-    compile (name: 'FtcCommon-release', ext: 'aar')
-    compile (name:'Analytics-release', ext:'aar')
-    compile (name:'WirelessP2p-release', ext:'aar')
-    testCompile 'hamcrest:hamcrest-all-1.3'
-    testCompile 'junit:junit:4.12'
+    implementation project(':FtcRobotController')
+    implementation project(':opencv')
+    implementation (name: 'RobotCore-release', ext: 'aar')
+    implementation (name: 'Hardware-release', ext: 'aar')
+    implementation (name: 'FtcCommon-release', ext: 'aar')
+    implementation (name:'Analytics-release', ext:'aar')
+    implementation (name:'WirelessP2p-release', ext:'aar')
+    testImplementation 'hamcrest:hamcrest-all-1.3'
+    testImplementation 'junit:junit:4.12'
 }
