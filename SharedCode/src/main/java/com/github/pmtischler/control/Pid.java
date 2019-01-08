@@ -41,7 +41,7 @@ public class Pid {
         runningIntegral = clampValue(runningIntegral + e * dt,
                                      integralMin, integralMax);
         double d = (e - previousError) / dt;
-        double output = clampValue(kp * (e + (runningIntegral / ti) + (td * d)),
+        double output = clampValue(kp*e + (runningIntegral / ti) + (td * d),
                                    outputMin, outputMax);
 
         previousError = e;
